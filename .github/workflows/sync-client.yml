@@ -11,13 +11,23 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Push to client repository
         env:
           CLIENT_GITHUB_TOKEN: ${{ secrets.CLIENT_GITHUB_TOKEN }}
+          CLIENT_REPO: masoubalqarya/masoub-alqariyah-website
         run: |
-          git remote add client https://x-access-token:${CLIENT_GITHUB_TOKEN}@github.com/masoubalqarya/masoub-alqariyah-website.git
-          git push client main --force
+          set -euo pipefail
+
+          if [ -z "${CLIENT_GITHUB_TOKEN}" ]; then
+            echo "::error::CLIENT_GITHUB_TOKEN secret is not set in this repository."
+            exit 1
+          fi
+
+          git remote add client "https://x-access-token:${CLIENT_GITHUB_TOKEN}@github.com/${CLIENT_REPO}.git"
+
+          # Checkout leaves a detached HEAD; push the checked-out commit to client main.
+          git push client HEAD:refs/heads/main --force
