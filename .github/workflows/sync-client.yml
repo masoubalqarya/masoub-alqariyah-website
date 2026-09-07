@@ -1,0 +1,23 @@
+name: Sync to Client Repository
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to client repository
+        env:
+          CLIENT_GITHUB_TOKEN: ${{ secrets.CLIENT_GITHUB_TOKEN }}
+        run: |
+          git remote add client https://x-access-token:${CLIENT_GITHUB_TOKEN}@github.com/masoubalqarya/masoub-alqariyah-website.git
+          git push client main --force
