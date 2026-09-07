@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Masoub AlQarya — Customer Website
 
-## Getting Started
+Public **Next.js 16** website for **Masoub AlQarya** (معصوب القرية): marketing pages plus drive-through food ordering. Built with **JavaScript / JSX**, Tailwind CSS 4, and the Firebase client SDK.
 
-First, run the development server:
+Currency is always **Saudi Riyal (SAR / ر.س)**. Default UI is **Arabic RTL**; English LTR is toggleable.
+
+Agent context: [`AGENTS.md`](./AGENTS.md). Copilot / IDE shortcuts: [`.github/copilot-instructions.md`](./.github/copilot-instructions.md).
+
+## Companion repos (same Firebase)
+
+| App | Path |
+| --- | --- |
+| Admin panel (menu CRUD, POS, **security rules**) | `D:\Dev\Web\clients\masoub-alqarya-admin-panel` |
+| Mobile app (Expo) | `D:\Dev\React Native\clients\masoub-alqarya` |
+
+---
+
+## Features
+
+| Route | Description |
+| --- | --- |
+| `/` | Home — hero, how ordering works, featured offers, locations |
+| `/menu` | Full menu, categories, search, offers |
+| `/item?id=` | Item customisation (size, cooking, extras) |
+| `/offer?id=` | Offer detail → cart |
+| `/cart` | Cart + restaurant selection |
+| `/checkout` | Car plate, card/cash, place order |
+| `/track?id=` | Live order status |
+| `/orders` | Order history (signed-in account) |
+| `/account` | Sign in / sign up / Google |
+| `/locations` | Restaurant locations |
+| `/about` | About |
+
+Guest checkout uses **Firebase Anonymous Auth**. A full email or Google account is required for `/orders`.
+
+---
+
+## Tech stack
+
+- **Framework:** Next.js 16 (App Router, React 19, JS/JSX)
+- **Path alias:** `@/*` → `./src/*` (`jsconfig.json`)
+- **Styling:** Tailwind CSS 4
+- **Fonts:** Cairo (Arabic) + Lato (English)
+- **Backend:** Firebase Auth, Firestore, Storage — `src/lib/firebase.js`
+- **Icons:** Lucide React
+
+---
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- Access to the Masoub AlQarya Firebase project
+
+### 1. Install & run
 
 ```bash
+cd masoub-alqarya-website
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. Firebase configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Web config is initialized in `src/lib/firebase.js`. Point that file at the correct project before running locally.
 
-## Learn More
+### 3. Firebase Console (required for checkout)
 
-To learn more about Next.js, take a look at the following resources:
+In [Firebase Console](https://console.firebase.google.com/) → **Authentication**:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Enable **Anonymous** sign-in (guest checkout)
+2. Enable **Email/Password** and **Google** (accounts)
+3. Add this site’s domain (and `localhost`) under **Settings → Authorized domains**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Deploy Firestore rules from the **admin panel** repo (`firestore.rules`). Customers without a staff `users/{uid}` doc must not fail rule evaluation; creating customers can read their own orders (`userId == auth.uid`).
 
-## Deploy on Vercel
+```bash
+# from the admin panel repo
+firebase deploy --only firestore:rules,storage
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project structure
+
+```
+src/
+├── app/                 # App Router pages
+├── components/          # Header, Footer, cards, banners
+├── hooks/               # Auth, cart, menu, restaurants
+├── lib/
+│   ├── firebase.js      # Firebase init
+│   ├── auth.js          # Anonymous + email + Google
+│   ├── orders.js        # createOrder (matches mobile)
+│   ├── i18n/            # en.js / ar.js
+│   └── utils.js         # formatSAR, localStorage keys
+└── types/index.js       # JSDoc domain models
+```
+
+---
+
+## Deploy to Vercel
+
+1. Push this repo to GitHub (or another Git host)
+2. Import the project in [Vercel](https://vercel.com)
+3. Confirm Firebase config in `src/lib/firebase.js` (or migrate to env vars and set them in Vercel)
+4. After deploy, add the Vercel domain to Firebase **Authorized domains**
+
+```bash
+npm i -g vercel
+vercel
+```
+
+---
+
+## Currency
+
+All monetary values are in **SAR (ر.س)**. Use `formatSAR()` from `src/lib/utils.js` in the UI.
+
+---
+
+## License
+
+Private — Masoub AlQarya.
