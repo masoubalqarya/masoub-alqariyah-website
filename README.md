@@ -1,44 +1,52 @@
-# Masoub AlQarya — Customer Website
+# Welcome to Masoub AlQarya — Customer Website
 
 Public **Next.js 16** website for **Masoub AlQarya** (معصوب القرية): marketing pages plus drive-through food ordering. Built with **JavaScript / JSX**, Tailwind CSS 4, and the Firebase client SDK.
 
 Currency is always **Saudi Riyal (SAR / ر.س)**. Default UI is **Arabic RTL**; English LTR is toggleable.
 
-Agent context: [`AGENTS.md`](./AGENTS.md). Copilot / IDE shortcuts: [`.github/copilot-instructions.md`](./.github/copilot-instructions.md).
+Agent context: `[AGENTS.md](./AGENTS.md)`. Copilot / IDE shortcuts: `[.github/copilot-instructions.md](./.github/copilot-instructions.md)`.
 
 ## Companion repos (same Firebase)
 
-| App | Path |
-| --- | --- |
+
+| App                                              | Path                                            |
+| ------------------------------------------------ | ----------------------------------------------- |
 | Admin panel (menu CRUD, POS, **security rules**) | `D:\Dev\Web\clients\masoub-alqarya-admin-panel` |
-| Mobile app (Expo) | `D:\Dev\React Native\clients\masoub-alqarya` |
+| Mobile app (Expo)                                | `D:\Dev\React Native\clients\masoub-alqarya`    |
+
 
 ---
 
+
+
 ## Features
 
-| Route | Description |
-| --- | --- |
-| `/` | Home — hero, how ordering works, featured offers, locations |
-| `/menu` | Full menu, categories, search, offers |
-| `/item?id=` | Item customisation (size, cooking, extras) |
-| `/offer?id=` | Offer detail → cart |
-| `/cart` | Cart + restaurant selection |
-| `/checkout` | Car plate, card/cash, place order |
-| `/track?id=` | Live order status |
-| `/orders` | Order history (signed-in account) |
-| `/account` | Sign in / sign up / Google |
-| `/locations` | Restaurant locations |
-| `/about` | About |
+
+| Route        | Description                                                 |
+| ------------ | ----------------------------------------------------------- |
+| `/`          | Home — hero, how ordering works, featured offers, locations |
+| `/menu`      | Full menu, categories, search, offers                       |
+| `/item?id=`  | Item customisation (size, cooking, extras)                  |
+| `/offer?id=` | Offer detail → cart                                         |
+| `/cart`      | Cart + restaurant selection                                 |
+| `/checkout`  | Car plate, card/cash, place order                           |
+| `/track?id=` | Live order status                                           |
+| `/orders`    | Order history (signed-in account)                           |
+| `/account`   | Sign in / sign up / Google                                  |
+| `/locations` | Restaurant locations                                        |
+| `/about`     | About                                                       |
+
 
 Guest checkout uses **Firebase Anonymous Auth**. A full email or Google account is required for `/orders`.
 
 ---
 
+
+
 ## Tech stack
 
 - **Framework:** Next.js 16 (App Router, React 19, JS/JSX)
-- **Path alias:** `@/*` → `./src/*` (`jsconfig.json`)
+- **Path alias:** `@/`* → `./src/*` (`jsconfig.json`)
 - **Styling:** Tailwind CSS 4
 - **Fonts:** Cairo (Arabic) + Lato (English)
 - **Backend:** Firebase Auth, Firestore, Storage — `src/lib/firebase.js`
@@ -46,12 +54,18 @@ Guest checkout uses **Firebase Anonymous Auth**. A full email or Google account 
 
 ---
 
+
+
 ## Getting started
+
+
 
 ### Prerequisites
 
 - Node.js 18+ and npm
 - Access to the Masoub AlQarya Firebase project
+
+
 
 ### 1. Install & run
 
@@ -84,6 +98,8 @@ firebase deploy --only firestore:rules,storage
 
 ---
 
+
+
 ## Project structure
 
 ```
@@ -102,6 +118,8 @@ src/
 
 ---
 
+
+
 ## Deploy to Vercel
 
 1. Push this repo to GitHub (or another Git host)
@@ -116,11 +134,15 @@ vercel
 
 ---
 
+
+
 ## Currency
 
 All monetary values are in **SAR (ر.س)**. Use `formatSAR()` from `src/lib/utils.js` in the UI.
 
 ---
+
+
 
 ## License
 
