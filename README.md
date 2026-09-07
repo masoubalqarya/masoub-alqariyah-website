@@ -1,4 +1,4 @@
-# Welcome to Masoub AlQarya — Customer Website
+# Masoub AlQarya — Customer Website
 
 Public **Next.js 16** website for **Masoub AlQarya** (معصوب القرية): marketing pages plus drive-through food ordering. Built with **JavaScript / JSX**, Tailwind CSS 4, and the Firebase client SDK.
 
@@ -46,7 +46,7 @@ Guest checkout uses **Firebase Anonymous Auth**. A full email or Google account 
 ## Tech stack
 
 - **Framework:** Next.js 16 (App Router, React 19, JS/JSX)
-- **Path alias:** `@/`* → `./src/*` (`jsconfig.json`)
+- **Path alias:** `@/`* → `./src/`* (`jsconfig.json`)
 - **Styling:** Tailwind CSS 4
 - **Fonts:** Cairo (Arabic) + Lato (English)
 - **Backend:** Firebase Auth, Firestore, Storage — `src/lib/firebase.js`
