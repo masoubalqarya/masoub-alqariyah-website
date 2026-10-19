@@ -90,7 +90,7 @@ Root layout: `src/app/layout.jsx` — Cairo/Lato, RTL default. `providers.jsx` w
 
 ### Auth
 
-- **Guest checkout:** `ensureAuth()` in `src/lib/auth.js` signs in **anonymously** if there is no current user, then `createOrder` writes `userId: auth.currentUser.uid`.
+- **Guest checkout:** `ensureAuth()` in `src/lib/auth.js` signs in **anonymously** if there is no current user. `createOrder` calls `ensureAuth()` itself and writes `userId` from that session. Mobile uses the same pattern in `src/firebase/auth.js` / `src/firebase/orders.js`.
 - **Full account:** email/password + Google (`signInWithPopup`). Sign-up / Google writes `customers/{uid}` (not staff `users`). Anonymous users are not written to `customers`.
 - `/orders` requires a **non-anonymous** account (`isFullAccount`). Guests can still track via `/track?id=` and the header last-order link (`LAST_ORDER_KEY` in localStorage; Header re-reads it on pathname change).
 
@@ -104,7 +104,7 @@ Staff profiles (`users` with `admin` / `cashier` / `user`) are owned by the admi
   - `useCart` — cart + selected restaurant in localStorage (`maq_cart_v1`, `maq_saved_restaurant`)
   - `useMenu` — categories, items, active offers, sizes, extras, allergies
   - `useRestaurants` — locations
-  - `src/lib/orders.js` — `createOrder`, `subscribeToOrder`, `fetchUserOrders`
+  - `src/lib/orders.js` — `createOrder` (calls `ensureAuth()`), `subscribeToOrder`, `fetchUserOrders`
 - **i18n:** `src/lib/i18n/` — dictionaries `en.js` / `ar.js`. Default **Arabic RTL**. Use logical CSS (`start`/`end`/`ms`/`me`/`border-e`), not raw `left`/`right`. Add **both** EN and AR strings for any new UI copy.
 - **Money / orders:** `formatSAR`, `generateOrderNumber`, `statusColors` in `src/lib/utils.js`.
 - **Types:** update JSDoc in `src/types/index.js` when changing data shapes.

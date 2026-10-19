@@ -42,7 +42,7 @@ Layout: `providers.jsx` → Auth → I18n → Cart → `SiteShell`.
 
 - Client-heavy `"use client"` pages; live data via `onSnapshot`
 - Hooks: `useAuth`, `useCart`, `useMenu`, `useRestaurants`
-- Orders: `src/lib/orders.js` — `createOrder`, `subscribeToOrder`, `fetchUserOrders`
+- Orders: `src/lib/orders.js` — `createOrder` (calls `ensureAuth()`), `subscribeToOrder`, `fetchUserOrders`
 - Auth: `src/lib/auth.js` — `ensureAuth()` (anonymous), email, Google; full accounts write `customers/{uid}`
 - i18n: `src/lib/i18n/` (`en.js` / `ar.js`); logical CSS (`start`/`end`)
 - Cart + restaurant persist in localStorage (`src/lib/utils.js` keys)

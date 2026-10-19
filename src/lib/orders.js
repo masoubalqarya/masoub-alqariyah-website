@@ -10,6 +10,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { db, auth } from "./firebase";
+import { ensureAuth } from "./auth";
 
 /**
  * Create a new order document in Firestore.
@@ -20,6 +21,7 @@ import { db, auth } from "./firebase";
  * @returns {Promise<string>} Firestore document ID
  */
 export async function createOrder(orderData, cartItems) {
+  const user = await ensureAuth();
   const orderDoc = {
     orderNumber: orderData.orderNumber ?? null,
     plateNumber: orderData.plateNumber ?? "",
@@ -33,7 +35,7 @@ export async function createOrder(orderData, cartItems) {
     restaurantName: orderData.restaurantName ?? "",
     estimatedTime: orderData.estimatedTime ?? 15,
     status: "pending",
-    userId: auth.currentUser?.uid || null,
+    userId: user.uid,
     items: cartItems.map((item) => ({
       itemId: item.id ?? null,
       nameEn: item.nameEn ?? item.name ?? "",

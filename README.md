@@ -85,7 +85,7 @@ Web config is initialized in `src/lib/firebase.js`. Point that file at the corre
 
 In [Firebase Console](https://console.firebase.google.com/) → **Authentication**:
 
-1. Enable **Anonymous** sign-in (guest checkout)
+1. Enable **Anonymous** sign-in (guest checkout on this site and the mobile app)
 2. Enable **Email/Password** and **Google** (accounts)
 3. Add this site’s domain (and `localhost`) under **Settings → Authorized domains**
 
