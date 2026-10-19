@@ -35,9 +35,14 @@ Agent context: `[AGENTS.md](./AGENTS.md)`. Copilot / IDE shortcuts: `[.github/co
 | `/account`   | Sign in / sign up / Google                                  |
 | `/locations` | Restaurant locations                                        |
 | `/about`     | About                                                       |
+| `/privacy`   | Bilingual privacy policy                                    |
+| `/delete-account` | Account deletion request instructions                 |
+| `/support`   | Customer support information and email contact              |
 
 
 Guest checkout uses **Firebase Anonymous Auth**. A full email or Google account is required for `/orders`.
+
+Privacy, deletion, and support pages are linked from the site footer. Customer and privacy requests are directed to `info@masoubalqariyah.com`.
 
 ---
 

@@ -27,6 +27,15 @@ export default function Footer() {
           <Link href="/account" className="hover:underline">
             {t.navAccount}
           </Link>
+          <Link href="/privacy" className="hover:underline">
+            {t.navPrivacy}
+          </Link>
+          <Link href="/delete-account" className="hover:underline">
+            {t.navDeleteAccount}
+          </Link>
+          <Link href="/support" className="hover:underline">
+            {t.navSupport}
+          </Link>
         </div>
       </div>
       <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-primary-foreground/70">

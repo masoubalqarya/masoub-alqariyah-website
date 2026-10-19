@@ -16,6 +16,9 @@ const en = {
   navAccount: "Account",
   navOrders: "My orders",
   navTrack: "Track",
+  navPrivacy: "Privacy",
+  navDeleteAccount: "Delete account",
+  navSupport: "Support",
 
   heroTitle: "Yemeni masoub, to your window.",
   heroSubtitle:
@@ -176,6 +179,142 @@ const en = {
   language: "Language",
   languageEnglish: "English",
   languageArabic: "عربي",
+  privacyPage: {
+    title: "Privacy policy",
+    intro:
+      "This policy explains what information Masoub AlQarya collects when you use our website or app, why we use it, and the choices available to you.",
+    updated: "Last updated: 19 October 2026",
+    sections: [
+      {
+        title: "Information we collect",
+        items: [
+          "Account information, such as your name, email address, and secure Firebase authentication identifier when you create or use an account.",
+          "Order information, including ordered items, selected branch, order number, car plate, car model and colour, payment method, and cash-change details when applicable.",
+          "Technical and preference information needed to operate the service, such as language, cart, selected branch, last order, device or browser information, and diagnostic data.",
+        ],
+      },
+      {
+        title: "How we use information",
+        items: [
+          "To create, prepare, deliver, and help you track your orders.",
+          "To identify your vehicle at the selected branch and provide customer support.",
+          "To maintain accounts, remember essential preferences, protect the service, diagnose problems, and improve the ordering experience.",
+          "To comply with applicable legal, tax, accounting, and regulatory obligations.",
+        ],
+      },
+      {
+        title: "How information is shared",
+        paragraphs: [
+          "We share information only as needed to operate the service: with the selected branch and authorised staff who prepare or fulfil an order; with infrastructure providers such as Firebase and our website hosting provider; or with authorities when disclosure is legally required. We do not sell your personal information.",
+        ],
+      },
+      {
+        title: "Storage and security",
+        paragraphs: [
+          "Account and order data is stored using Firebase services. Some essential preferences are stored in your browser or device. We apply reasonable administrative and technical safeguards, but no internet service can guarantee absolute security.",
+        ],
+      },
+      {
+        title: "Retention and deletion",
+        paragraphs: [
+          "We keep personal information only for as long as it is needed for the purposes described above. You may request account deletion at any time. Some order or transaction records may be retained when required for legal, tax, accounting, fraud-prevention, or dispute-resolution purposes, then deleted or anonymised when no longer required.",
+        ],
+      },
+      {
+        title: "Your choices and rights",
+        paragraphs: [
+          "You may ask to access, correct, or delete your personal information, or raise a privacy concern. You can also use the service as a guest where available. Identity verification may be required before we act on a request.",
+        ],
+      },
+      {
+        title: "Children's privacy and policy changes",
+        paragraphs: [
+          "The service is not intended for children to create accounts or place orders without parent or guardian supervision. We may update this policy when our practices or legal obligations change; the date above will show the latest revision.",
+        ],
+      },
+    ],
+    contact: {
+      title: "Privacy questions?",
+      body: "Contact us about your information, privacy rights, or this policy at info@masoubalqariyah.com.",
+      action: "Email privacy support",
+      subject: "Privacy request",
+    },
+  },
+  deleteAccountPage: {
+    title: "Delete your account",
+    intro:
+      "You can ask us to permanently delete your Masoub AlQarya account and the personal information linked to it.",
+    updated: "Account and data request",
+    sections: [
+      {
+        title: "Before you request deletion",
+        items: [
+          "Complete or resolve any active order first. Deleting an account does not cancel an order already sent to a branch.",
+          "You will lose access to your account and order history after deletion is completed.",
+          "For a privacy request about a guest order, include the order number so we can locate the relevant record.",
+        ],
+      },
+      {
+        title: "How to request deletion",
+        items: [
+          "Email info@masoubalqariyah.com with the subject “Account deletion request”.",
+          "Send the request from the email address used for your account and include your full name.",
+          "If you cannot access that email address, explain this in your message so we can offer another verification method.",
+        ],
+      },
+      {
+        title: "What happens next",
+        paragraphs: [
+          "We will verify that you own the account before processing the request. After verification, we will delete the account and personal profile data that we are not required to retain, and confirm when the request is complete.",
+          "Certain order or transaction records may be kept where Saudi law or legitimate accounting, fraud-prevention, or dispute-resolution needs require it. Access to retained records is restricted, and they are removed or anonymised when the retention requirement ends.",
+        ],
+      },
+    ],
+    contact: {
+      title: "Ready to submit your request?",
+      body: "Use the email address connected to your account so we can verify your request safely.",
+      action: "Request account deletion",
+      subject: "Account deletion request",
+    },
+  },
+  supportPage: {
+    title: "Customer support",
+    intro:
+      "We are here to help with orders, accounts, the website, and the Masoub AlQarya app.",
+    updated: "How can we help?",
+    sections: [
+      {
+        title: "What we can help with",
+        items: [
+          "Questions about an active or previous order.",
+          "Sign-in, account access, privacy, or account deletion requests.",
+          "Problems using the website or mobile app.",
+          "General questions about the menu, branches, and drive-through pickup.",
+        ],
+      },
+      {
+        title: "What to include",
+        items: [
+          "Your name and the email address connected to your account, if relevant.",
+          "Your order number and selected branch for order-related questions.",
+          "A short description of the issue, what you expected, and any error message you saw.",
+          "Your device, browser, or app platform for technical problems.",
+        ],
+      },
+      {
+        title: "Keep your account secure",
+        paragraphs: [
+          "Never send your password, one-time verification codes, or full payment-card details by email. Masoub AlQarya support will not ask you for them.",
+        ],
+      },
+    ],
+    contact: {
+      title: "Email our support team",
+      body: "Send your request to info@masoubalqariyah.com and include the details above so we can help efficiently.",
+      action: "Contact support",
+      subject: "Customer support request",
+    },
+  },
   footerRights: "All rights reserved.",
   contact: "Contact",
 };

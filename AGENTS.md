@@ -81,8 +81,13 @@ Scripts: `npm run dev` | `build` | `start` | `lint`
 | `/account` | `src/app/account/page.jsx` | Email/password + Google; profile / sign out |
 | `/locations` | `src/app/locations/page.jsx` | Restaurant list |
 | `/about` | `src/app/about/page.jsx` | About |
+| `/privacy` | `src/app/privacy/page.jsx` | Public bilingual privacy policy |
+| `/delete-account` | `src/app/delete-account/page.jsx` | Account deletion request instructions via support email |
+| `/support` | `src/app/support/page.jsx` | Customer support guidance and email contact |
 
 Root layout: `src/app/layout.jsx` — Cairo/Lato, RTL default. `providers.jsx` wraps Auth → I18n → Cart → `SiteShell` (header, pending-order banner, footer).
+
+Public information pages use `src/components/PublicInfoPage.jsx` for a shared RTL-safe layout and direct customers to `info@masoubalqariyah.com`. Footer links expose all three routes.
 
 ### Typical order flow
 
@@ -106,6 +111,7 @@ Staff profiles (`users` with `admin` / `cashier` / `user`) are owned by the admi
   - `useRestaurants` — locations
   - `src/lib/orders.js` — `createOrder` (calls `ensureAuth()`), `subscribeToOrder`, `fetchUserOrders`
 - **i18n:** `src/lib/i18n/` — dictionaries `en.js` / `ar.js`. Default **Arabic RTL**. Use logical CSS (`start`/`end`/`ms`/`me`/`border-e`), not raw `left`/`right`. Add **both** EN and AR strings for any new UI copy.
+- **Public information pages:** `PublicInfoPage` renders localized policy/support sections and the shared support email action for `/privacy`, `/delete-account`, and `/support`.
 - **Money / orders:** `formatSAR`, `generateOrderNumber`, `statusColors` in `src/lib/utils.js`.
 - **Types:** update JSDoc in `src/types/index.js` when changing data shapes.
 - **Cart merge:** same item with different `selectedSize` / `selectedCookingOption` / `selectedExtras` stays as separate lines (`src/hooks/useCart.jsx`).
