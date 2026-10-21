@@ -30,6 +30,9 @@ export default function Footer() {
           <Link href="/privacy" className="hover:underline">
             {t.navPrivacy}
           </Link>
+          <Link href="/terms" className="hover:underline">
+            {t.navTerms}
+          </Link>
           <Link href="/delete-account" className="hover:underline">
             {t.navDeleteAccount}
           </Link>

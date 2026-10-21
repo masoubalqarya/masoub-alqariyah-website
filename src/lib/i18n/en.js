@@ -17,6 +17,7 @@ const en = {
   navOrders: "My orders",
   navTrack: "Track",
   navPrivacy: "Privacy",
+  navTerms: "Terms & conditions",
   navDeleteAccount: "Delete account",
   navSupport: "Support",
 
@@ -238,6 +239,94 @@ const en = {
       body: "Contact us about your information, privacy rights, or this policy at info@masoubalqariyah.com.",
       action: "Email privacy support",
       subject: "Privacy request",
+    },
+  },
+  termsPage: {
+    title: "Terms and conditions",
+    intro:
+      "These terms govern your use of the Masoub AlQarya website and mobile app, including accounts, ordering, payment selection, and drive-through pickup.",
+    updated: "Effective date: 19 October 2026",
+    sections: [
+      {
+        title: "Accepting these terms",
+        paragraphs: [
+          "By accessing or using the website or app, creating an account, or placing an order, you agree to these terms and our Privacy Policy. If you do not agree, please do not use the service.",
+          "You must be legally able to enter into this agreement. A parent or guardian must supervise use by a minor and is responsible for orders placed under that supervision.",
+        ],
+      },
+      {
+        title: "Accounts and guest use",
+        items: [
+          "You may order as a guest where available or create an account for supported account features.",
+          "You are responsible for providing accurate information and keeping your sign-in details secure.",
+          "Tell us promptly if you believe your account has been accessed without permission.",
+          "We may restrict or suspend access when reasonably necessary to protect customers, the service, or comply with law.",
+        ],
+      },
+      {
+        title: "Menu, prices, and availability",
+        paragraphs: [
+          "Menu items, ingredients, sizes, extras, offers, prices, calories, preparation times, and branch availability may change. We try to keep information accurate, but an item or offer may become unavailable before an order is accepted. Prices are shown in Saudi riyals and any applicable charges will be presented before you place the order.",
+          "If you have an allergy or dietary concern, review the available item information and contact the branch before ordering. Restaurant food is prepared in shared environments, so we cannot guarantee that any item is completely free from a particular allergen.",
+        ],
+      },
+      {
+        title: "Orders and acceptance",
+        items: [
+          "Review your items, customisations, branch, vehicle details, and payment method before placing an order.",
+          "An on-screen confirmation means we received your request; an order remains subject to branch acceptance, item availability, and operational capacity.",
+          "We may contact you or cancel all or part of an order if information is incomplete, an item is unavailable, a price is clearly incorrect, or fulfilment is not reasonably possible.",
+          "Estimated preparation times are estimates and may change with demand or circumstances at the branch.",
+        ],
+      },
+      {
+        title: "Payment, cancellation, and refunds",
+        paragraphs: [
+          "Available payment methods are shown during checkout. When cash is selected, you must provide accurate change requirements and pay the order amount at pickup. Card availability and processing may depend on the branch or payment provider.",
+          "Contact support or the selected branch as soon as possible if you need to change or cancel an order. Once preparation has started, cancellation or changes may not be possible. Any refund or remedy is assessed according to the order circumstances, the payment method, and applicable Saudi law.",
+        ],
+      },
+      {
+        title: "Drive-through pickup",
+        items: [
+          "Go to the branch selected in your order and follow staff instructions and posted traffic or safety rules.",
+          "Provide accurate plate and vehicle details so staff can identify your car and deliver the correct order.",
+          "You are responsible for arriving safely, parking only where directed, and checking the order promptly after receiving it.",
+        ],
+      },
+      {
+        title: "Acceptable use",
+        paragraphs: [
+          "Do not misuse the website or app, interfere with its operation, attempt unauthorised access, submit false or fraudulent orders, impersonate another person, copy or scrape protected content, or use the service in violation of applicable law. We may take reasonable steps to prevent or investigate misuse.",
+        ],
+      },
+      {
+        title: "Intellectual property and third-party services",
+        paragraphs: [
+          "The Masoub AlQarya name, branding, content, design, and software are owned by or licensed to Masoub AlQarya and are protected by applicable rights. These terms give you a limited, personal, non-transferable right to use the service for its intended purpose.",
+          "The service may rely on or link to third-party services, including authentication, maps, hosting, and payment services. Their own terms and privacy practices may apply, and their availability is outside our direct control.",
+        ],
+      },
+      {
+        title: "Service availability and liability",
+        paragraphs: [
+          "We aim to provide a reliable service, but we do not promise uninterrupted or error-free access. We may maintain, change, or discontinue features where reasonably necessary.",
+          "To the fullest extent permitted by applicable law, Masoub AlQarya is not responsible for indirect or consequential loss arising from use of the service. Nothing in these terms excludes rights or liability that cannot lawfully be excluded, including mandatory consumer protections.",
+        ],
+      },
+      {
+        title: "Privacy, changes, and governing law",
+        paragraphs: [
+          "Our Privacy Policy explains how we handle personal information. We may update these terms when the service, our practices, or legal requirements change. The effective date above will show the latest revision, and continued use after an update means you accept the revised terms where permitted by law.",
+          "These terms are governed by the laws of the Kingdom of Saudi Arabia. Any dispute will be handled by the competent authorities or courts in Saudi Arabia, subject to any mandatory consumer rights.",
+        ],
+      },
+    ],
+    contact: {
+      title: "Questions about these terms?",
+      body: "Contact us at info@masoubalqariyah.com before using the service if anything in these terms is unclear.",
+      action: "Email us",
+      subject: "Terms and conditions question",
     },
   },
   deleteAccountPage: {

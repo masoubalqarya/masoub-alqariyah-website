@@ -36,12 +36,13 @@ Scripts: `npm run dev` | `build` | `start` | `lint`
 | `/locations` | Locations |
 | `/about` | About |
 | `/privacy` | Bilingual privacy policy |
+| `/terms` | Terms and conditions for the website and mobile app |
 | `/delete-account` | Account deletion request instructions |
 | `/support` | Customer support and email contact |
 
 Layout: `providers.jsx` → Auth → I18n → Cart → `SiteShell`.
 
-`PublicInfoPage` provides the shared RTL-safe layout for the three public information routes. Their footer links and support actions use `info@masoubalqariyah.com`.
+`PublicInfoPage` provides the shared RTL-safe layout for the public privacy, terms, deletion, and support routes. Their footer links and support actions use `info@masoubalqariyah.com`.
 
 ## Architecture
 
