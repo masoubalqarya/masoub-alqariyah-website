@@ -2,6 +2,12 @@
 
 Living project context for AI agents. Keep this file accurate; prefer it over stale assumptions.
 
+## Mobile voice ordering compatibility (2026-10-31)
+
+The mobile app now has a feature-flagged `/assistant` using the admin's Firebase-authenticated `/api/ai-ordering`. The admin owns the AI secrets, validated catalog tool engine, server-only `orderingOperations` receipts and `orderingRateLimits` counters. Configure TTL on those collections' `expiresAt` fields; they are default-denied to clients. Mobile retains its existing Zustand cart with revision checks and explicit restaurant/car/payment checkout; there is no separate AI cart or order database. Ingredient removal and voice edits of promotional groups are unsupported.
+
+Assisted mobile checkout creates normal `orders` with the same fields and `pending` status used by this website, using deterministic create-only IDs for retries. No website order schema/status/rules/UI changes were made. Existing mobile card selection, like this website's card-method workflow, is not a payment-gateway integration. A future QR client can reuse the admin API/pure engine; do not introduce an independent AI pricing/order system. Mobile `docs/voice-ordering.md` documents setup, models, costs and unverified native/live POS acceptance gates. Both AI feature flags default off; there is no voice entry on this website yet.
+
 ## Mandatory maintenance
 
 **After every change you make in this repository, update `AGENTS.md` in the same turn** so it stays consistent with the codebase.
@@ -31,7 +37,7 @@ Backend is the **same Firebase project** as the admin panel and mobile app (Auth
 
 | | |
 | --- | --- |
-| **Repo path** | `D:\Dev\Web\clients\masoub-alqarya-admin-panel` |
+| **Repo path** | `C:\dev\masoub-alqariyah-admin` |
 | **Agent docs** | `AGENTS.md` in that repo (open via multi-root workspace) |
 | **Copilot docs** | `.github/copilot-instructions.md` in that repo |
 | **Owns** | Menu/offers/restaurants CRUD, staff roles, POS status updates, **`firestore.rules` / `storage.rules`** |
@@ -41,7 +47,7 @@ Backend is the **same Firebase project** as the admin panel and mobile app (Auth
 
 | | |
 | --- | --- |
-| **Repo path** | `D:\Dev\React Native\clients\masoub-alqarya` |
+| **Repo path** | `C:\dev\masoub-alqarya` |
 | **Agent docs** | `AGENTS.md` in that repo (open via multi-root workspace) |
 | **Copilot docs** | `.github/copilot-instructions.md` in that repo |
 | **Owns** | Native customer ordering UI, cart, car plate, payment, Track Order |

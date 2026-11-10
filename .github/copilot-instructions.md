@@ -2,6 +2,8 @@
 
 Companion to [`AGENTS.md`](../AGENTS.md). Prefer AGENTS.md for living project context; keep both files aligned when architecture changes.
 
+Mobile compatibility: the mobile `/assistant` uses the admin feature-flagged `/api/ai-ordering`, catalog-validated tools, real Zustand cart/revision checks and explicit existing checkout. Assisted orders retain this website's `orders` fields and `pending` status; no website schema/rules/UI change. Admin-only server receipts/counters (`orderingOperations`, `orderingRateLimits`) require TTL on `expiresAt` and are not customer-readable. No separate AI cart/database. Ingredient removal and voice offer edits are unsupported. Future QR ordering should reuse the admin engine/API; AI credentials remain server-only. Models/setup/costs and outstanding live/device acceptance are documented in mobile `docs/voice-ordering.md`. Flags default off; this website has no voice UI yet.
+
 ## Project overview
 
 Next.js **App Router** customer website for **Masoub AlQarya** (معصوب القرية). Hybrid marketing + drive-through ordering. Firebase (Auth, Firestore, Storage). Currency **SAR**. Default UI **Arabic RTL**; English LTR toggleable.

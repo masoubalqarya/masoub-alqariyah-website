@@ -4,6 +4,8 @@ Public **Next.js 16** website for **Masoub AlQarya** (معصوب القرية): 
 
 Currency is always **Saudi Riyal (SAR / ر.س)**. Default UI is **Arabic RTL**; English LTR is toggleable.
 
+The companion mobile app has a feature-flagged voice/text ordering interface backed by the admin's authenticated `/api/ai-ordering`. It uses the same order payload and cashier pipeline as this website. No voice UI or order-contract change is introduced here; a future QR interface can reuse that backend. Setup, costs, privacy behavior and remaining native/live verification are in the mobile repository's `docs/voice-ordering.md`. AI secrets remain on the admin server and both feature flags default off.
+
 Agent context: `[AGENTS.md](./AGENTS.md)`. Copilot / IDE shortcuts: `[.github/copilot-instructions.md](./.github/copilot-instructions.md)`.
 
 ## Companion repos (same Firebase)
