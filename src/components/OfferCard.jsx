@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { formatSAR } from "@/lib/utils";
 import MenuImage from "./MenuImage";
+import { isOfferInStock } from "@/lib/catalog";
 
-export default function OfferCard({ offer }) {
+export default function OfferCard({ offer, menuItems }) {
   const { locale, t } = useI18n();
   const isAr = locale === "ar";
   const title = isAr ? offer.titleAr : offer.titleEn;
@@ -28,6 +29,7 @@ export default function OfferCard({ offer }) {
         ) : null}
       </div>
       <div className="p-4">
+        {!isOfferInStock(offer, menuItems || []) && <p className="text-sm font-bold text-destructive">{t.outOfStock}</p>}
         <h3 className="display text-lg font-bold">{title}</h3>
         <p className="mt-1 text-sm font-semibold text-primary">
           {formatSAR(offer.offerPrice)}

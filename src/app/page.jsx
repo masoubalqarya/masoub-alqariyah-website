@@ -17,7 +17,7 @@ const STEPS = [
 export default function HomePage() {
   const { t, locale } = useI18n();
   const isAr = locale === "ar";
-  const { offers, loading: menuLoading } = useMenu();
+  const { offers, menuItems, loading: menuLoading } = useMenu();
   const { activeRestaurants, loading: restLoading } = useRestaurants();
   const featured = offers.slice(0, 3);
 
@@ -95,7 +95,7 @@ export default function HomePage() {
         ) : (
           <div className="mt-8 flex gap-4 overflow-x-auto pb-2">
             {featured.map((offer) => (
-              <OfferCard key={offer.id} offer={offer} />
+              <OfferCard key={offer.id} offer={offer} menuItems={menuItems} />
             ))}
           </div>
         )}

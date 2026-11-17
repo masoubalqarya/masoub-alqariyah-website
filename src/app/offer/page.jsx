@@ -9,6 +9,7 @@ import { useMenu } from "@/hooks/useMenu";
 import { useCart } from "@/hooks/useCart";
 import { formatSAR } from "@/lib/utils";
 import MenuImage from "@/components/MenuImage";
+import { isOfferInStock } from "@/lib/catalog";
 
 function OfferPageInner() {
   const { t, locale } = useI18n();
@@ -34,6 +35,7 @@ function OfferPageInner() {
   const savings = (offer.originalPrice || 0) - (offer.offerPrice || 0);
 
   const handleAdd = () => {
+    if (!isOfferInStock(offer, menuItems)) return;
     addOfferItems(offer, menuItems, sizeOptions);
     router.push("/menu");
   };
@@ -96,9 +98,10 @@ function OfferPageInner() {
         <button
           type="button"
           onClick={handleAdd}
+          disabled={!isOfferInStock(offer, menuItems)}
           className="mt-8 w-full rounded-full bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-md hover:bg-primary-dark"
         >
-          {t.addOfferToCart}
+          {isOfferInStock(offer, menuItems) ? t.addOfferToCart : t.outOfStock}
         </button>
       </div>
     </div>

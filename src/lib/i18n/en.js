@@ -1,6 +1,27 @@
 const en = {
+  // Fulfillment
+  inStock: "In stock",
+  outOfStock: "Out of stock",
+  featured: "Featured",
+  stockCartWarning: "Some cart items are unavailable. Remove them or change your order to continue.",
+  orderNotes: "Order notes (optional)",
+  orderNotesPlaceholder: "Any special instructions for your order?",
+  orderNotesHint: "Up to 500 characters.",
+  fulfillmentMethod: "Order method",
+  driveThrough: "Car service",
+  pickup: "Pickup from branch",
+  driveThroughDescription: "We bring your order to your car.",
+  pickupDescription: "Collect inside your selected branch. No car details needed.",
+  pickupInstructions: "When your order is ready, collect it inside your selected branch using your order number.",
+  readyForPickup: "Ready for pickup",
+  collected: "Collected",
+  pickupCollectedMessage: "Your order has been collected. Enjoy your meal!",
+  pickupChange: "Collect your change at the counter.",
+  markReadyForPickup: "Ready for pickup",
+  markCollected: "Confirm collected",
+
   appName: "Masoub AlQarya",
-  tagline: "Order & receive in your car",
+  tagline: "Order and collect your way",
   orderNow: "Order now",
   viewMenu: "View menu",
   viewLocations: "Our locations",
@@ -21,22 +42,26 @@ const en = {
   navDeleteAccount: "Delete account",
   navSupport: "Support",
 
-  heroTitle: "Yemeni masoub, to your window.",
+  heroTitle: "Masoub AlQarya, your way.",
   heroSubtitle:
-    "Authentic village flavours from Masoub AlQarya — order on the web, pull up, and we bring it to your car.",
-  howTitle: "How drive-through works",
+    "Authentic village flavours — order online for collection inside the branch or service to your car.",
+  howTitle: "How to order and collect",
   how1Title: "Browse & build",
-  how1Desc: "Pick masoub, foul, drinks and offers. Customize size, cooking, and extras.",
-  how2Title: "Tell us your car",
-  how2Desc: "Choose a branch, enter your plate, and pay by card or cash at the window.",
-  how3Title: "Stay in the car",
-  how3Desc: "Track prep live. When you arrive, we deliver the order to your vehicle.",
+  how1Desc:
+    "Pick masoub, foul, drinks and offers. Customize size, cooking, and extras.",
+  how2Title: "Choose how to collect",
+  how2Desc:
+    "Choose a branch and pickup or car service, then select your preferred payment method.",
+  how3Title: "Collect your order",
+  how3Desc:
+    "Track your order, then collect inside with your order number or receive it in your car.",
   featuredOffers: "Today's offers",
   seeAllOffers: "See menu",
   locationsTeaser: "Find a branch",
-  locationsTeaserDesc: "Open locations ready for drive-through pickup.",
+  locationsTeaserDesc: "Our branches welcome you for counter pickup or car service.",
   appCtaTitle: "Prefer ordering on your phone?",
-  appCtaDesc: "The Masoub AlQarya app will be on the App Store and Google Play soon.",
+  appCtaDesc:
+    "The Masoub AlQarya app will be on the App Store and Google Play soon.",
 
   aboutTitle: "About us",
   aboutLead: "Village recipes, city pace.",
@@ -131,7 +156,8 @@ const en = {
   plateRequired: "Please enter your car plate.",
   restaurantRequired: "Please select a branch.",
   cashTooLow: "Cash amount must be at least the order total.",
-  guestCheckoutNote: "You can order as a guest. Sign in later to keep order history.",
+  guestCheckoutNote:
+    "You can order as a guest. Sign in later to keep order history.",
 
   orderConfirmation: "Order confirmed",
   orderNumber: "Order number",
@@ -143,7 +169,8 @@ const en = {
 
   trackOrder: "Track order",
   trackNotFound: "We could not find this order.",
-  trackNeedId: "Open this page from a confirmation link, or sign in to see your orders.",
+  trackNeedId:
+    "Open this page from a confirmation link, or sign in to see your orders.",
   stayInCar: "Stay in your car — we will bring the order to you.",
   pending: "Pending",
   preparing: "Preparing",

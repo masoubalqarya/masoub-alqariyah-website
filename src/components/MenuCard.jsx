@@ -7,6 +7,7 @@ import { useCart } from "@/hooks/useCart";
 import { formatSAR } from "@/lib/utils";
 import { itemHasCustomOptions } from "@/lib/menuDefaults";
 import MenuImage from "./MenuImage";
+import { isInStock } from "@/lib/catalog";
 
 export default function MenuCard({ item }) {
   const { t, locale } = useI18n();
@@ -14,9 +15,11 @@ export default function MenuCard({ item }) {
   const isAr = locale === "ar";
   const name = isAr ? item.nameAr : item.nameEn;
   const custom = itemHasCustomOptions(item);
+  const available = isInStock(item);
 
   const quickAdd = (e) => {
     e.preventDefault();
+    if (!available) return;
     addItem({
       id: item.id,
       nameEn: item.nameEn,
@@ -38,7 +41,7 @@ export default function MenuCard({ item }) {
           alt={name}
           className="h-full w-full transition duration-500 group-hover:scale-105"
         />
-        {!custom ? (
+        {!custom && available ? (
           <button
             type="button"
             onClick={quickAdd}
@@ -50,6 +53,8 @@ export default function MenuCard({ item }) {
         ) : null}
       </div>
       <div className="p-4">
+        {!available && <p className="text-sm font-bold text-destructive">{t.outOfStock}</p>}
+        {item.isFeatured && <p className="text-xs font-bold text-accent">{t.featured}</p>}
         <h3 className="display text-lg font-bold leading-snug">{name}</h3>
         <p className="mt-1 text-sm font-semibold text-primary">{formatSAR(item.price)}</p>
       </div>

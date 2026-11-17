@@ -8,13 +8,14 @@ import { useI18n } from "@/lib/i18n";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import { createOrder } from "@/lib/orders";
+import { useMenu } from "@/hooks/useMenu";
+import { isInStock } from "@/lib/catalog";
 import {
   CAR_COLORS,
   LAST_ORDER_KEY,
   SAVED_CAR_KEY,
   cn,
   formatSAR,
-  generateOrderNumber,
 } from "@/lib/utils";
 
 function colorLabel(t, key) {
@@ -39,6 +40,8 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, restaurant, total, clearCart, hydrated } = useCart();
   const { ensureAuth, isFullAccount } = useAuth();
+  const { menuItems, loading: menuLoading } = useMenu();
+  const unavailable = items.filter((line) => !isInStock(menuItems.find((item) => item.id === line.id)));
 
   const savedRaw = useSyncExternalStore(
     subscribeNoop,
@@ -63,8 +66,11 @@ export default function CheckoutPage() {
   const hasSavedCar = Boolean(savedCar?.plateNumber);
 
   const [paymentMethod, setPaymentMethod] = useState("card");
+  const [fulfillmentType, setFulfillmentType] = useState("driveThrough");
+  const pickup = fulfillmentType === "pickup";
   const [needsChange, setNeedsChange] = useState(null);
   const [cashInput, setCashInput] = useState("");
+  const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -95,9 +101,11 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
     setError("");
+    if (menuLoading || unavailable.length) { setError(t.stockCartWarning); return; }
 
-    if (!plate.trim()) {
+    if (!pickup && !plate.trim()) {
       setError(t.plateRequired);
       return;
     }
@@ -119,16 +127,16 @@ export default function CheckoutPage() {
     setSubmitting(true);
     try {
       await ensureAuth();
-      const orderNumber = generateOrderNumber();
       const cashAmount =
         paymentMethod === "cash"
           ? needsChange === false
             ? total
             : cashNum
           : 0;
-      const docId = await createOrder(
+      const order = await createOrder(
         {
-          orderNumber,
+          notes,
+          fulfillmentType,
           plateNumber: plate.trim(),
           carColor: color,
           carModel: model.trim(),
@@ -145,8 +153,12 @@ export default function CheckoutPage() {
         },
         items,
       );
+      const docId = order.id;
+      // The order is already committed. Optional browser preferences must not turn
+      // a successful checkout into a retry that could place another order.
+      try {
       localStorage.setItem(LAST_ORDER_KEY, docId);
-      localStorage.setItem(
+      if (!pickup) localStorage.setItem(
         SAVED_CAR_KEY,
         JSON.stringify({
           plateNumber: plate.trim(),
@@ -154,6 +166,7 @@ export default function CheckoutPage() {
           carColor: color,
         }),
       );
+      } catch { /* Tracking still opens with the confirmed order ID. */ }
       clearCart();
       router.push(`/track?id=${docId}`);
     } catch {
@@ -168,6 +181,7 @@ export default function CheckoutPage() {
       <h1 className="display text-4xl font-black text-primary-dark">{t.checkout}</h1>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-8">
+        {!menuLoading && unavailable.length > 0 && <p role="alert" className="text-sm font-bold text-destructive">{t.stockCartWarning}: {unavailable.map((line) => locale === "ar" ? line.nameAr : line.nameEn).join(", ")}</p>}
         <section className="rounded-3xl border border-border bg-card p-5">
           <p className="text-sm text-muted-foreground">{t.restaurant}</p>
           <p className="mt-1 font-bold">
@@ -181,7 +195,23 @@ export default function CheckoutPage() {
           </div>
         </section>
 
-        <section>
+        <fieldset disabled={submitting}>
+          <legend className="display text-2xl font-black">{t.fulfillmentMethod}</legend>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {["driveThrough", "pickup"].map((type) => (
+              <label key={type} className={cn("cursor-pointer rounded-3xl border p-4", fulfillmentType === type ? "border-primary bg-secondary/60" : "border-border bg-card")}>
+                <span className="flex items-center gap-3 font-bold">
+                  <input type="radio" name="fulfillmentType" value={type} checked={fulfillmentType === type} onChange={() => setFulfillmentType(type)} />
+                  {t[type]}
+                </span>
+                <span className="mt-2 block text-sm text-muted-foreground">{type === "pickup" ? t.pickupDescription : t.driveThroughDescription}</span>
+              </label>
+            ))}
+          </div>
+          {pickup && <p className="mt-3 text-sm text-muted-foreground">{t.pickupInstructions}</p>}
+        </fieldset>
+
+        {!pickup && <section>
           <h2 className="display flex items-center gap-2 text-2xl font-black">
             <Car size={22} /> {t.carPlateTitle}
           </h2>
@@ -235,7 +265,7 @@ export default function CheckoutPage() {
           {color ? (
             <p className="mt-2 text-sm text-muted-foreground">{colorLabel(t, color)}</p>
           ) : null}
-        </section>
+        </section>}
 
         <section>
           <h2 className="display text-2xl font-black">{t.paymentMethod}</h2>
@@ -296,7 +326,7 @@ export default function CheckoutPage() {
               >
                 <p className="font-bold">{t.yesNeedChange}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {t.deliveryBringsChange}
+                  {pickup ? t.pickupChange : t.deliveryBringsChange}
                 </p>
               </button>
               {needsChange === true ? (
@@ -334,6 +364,21 @@ export default function CheckoutPage() {
           ) : null}
         </section>
 
+        <section>
+          <label htmlFor="order-notes" className="display text-xl font-bold">{t.orderNotes}</label>
+          <textarea
+            id="order-notes"
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+            placeholder={t.orderNotesPlaceholder}
+            maxLength={500}
+            rows={3}
+            disabled={submitting}
+            className="mt-3 w-full rounded-2xl border border-border bg-card p-4 outline-none ring-primary focus:ring-2"
+          />
+          <p className="mt-1 text-sm text-muted-foreground">{t.orderNotesHint} ({notes.length}/500)</p>
+        </section>
+
         {!isFullAccount ? (
           <p className="text-sm text-muted-foreground">{t.guestCheckoutNote}</p>
         ) : null}
@@ -342,7 +387,7 @@ export default function CheckoutPage() {
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || menuLoading || unavailable.length > 0}
           className="w-full rounded-full bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-md hover:bg-primary-dark disabled:opacity-60"
         >
           {submitting ? t.placingOrder : t.confirmOrder}

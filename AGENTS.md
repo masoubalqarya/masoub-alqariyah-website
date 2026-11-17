@@ -23,7 +23,7 @@ If a change is purely cosmetic with no behavioral or structural impact, a docs u
 
 ## What this is
 
-Next.js **App Router** **customer website** for **Masoub AlQarya** (معصوب القرية) in Saudi Arabia. Hybrid **marketing site + drive-through ordering**: browse the menu, pick a restaurant, customize items, enter car plate details, pay (card/cash), and track the order in real time.
+Next.js **App Router** **customer website** for **Masoub AlQarya** (معصوب القرية) in Saudi Arabia. Hybrid **marketing site + car-service/pickup ordering**: browse the menu, pick a restaurant, customize items, choose collection inside the branch or delivery to the car, pay (card/cash), and track the order in real time.
 
 Backend is the **same Firebase project** as the admin panel and mobile app (Auth, Firestore, Storage). Currency is always **SAR (ر.س)**. Default UI locale is **Arabic RTL**; English LTR is toggleable.
 
@@ -66,6 +66,14 @@ When changing order fields, statuses, menu shapes, or security rules: update **a
 
 Scripts: `npm run dev` | `build` | `start` | `lint`
 
+## Minimal validation — no builds
+
+- Use the smallest check that verifies the change. For documentation-only or cosmetic changes, review the diff; do not run lint, typecheck, or tests.
+- For code changes, start with existing editor diagnostics for changed files. Run a targeted lint check or relevant existing test only when needed. Run typecheck only when the change needs type validation; it is not mandatory for every task.
+- Do not automatically run full-repository lint, full test suites, integration/emulator suites, Expo Doctor, dependency installation, or repeated checks. Broaden checks only for a concrete unresolved issue or an explicit user request.
+- **Do not run builds for validation:** no app/web/production/native/backend builds, EAS builds, `expo prebuild`, or bundle exports. Run a build only when the user explicitly requests building or shipping as the task itself.
+- Stop after the minimal relevant check passes. Report what was checked and any material limitation; do not fix unrelated baseline failures.
+
 ## Routes
 
 | Route | File | Purpose |
@@ -75,7 +83,7 @@ Scripts: `npm run dev` | `build` | `start` | `lint`
 | `/item` | `src/app/item/page.jsx` | Item detail + sizes/cooking/extras → cart (`?id=`) |
 | `/offer` | `src/app/offer/page.jsx` | Offer detail → cart (`?id=`) |
 | `/cart` | `src/app/cart/page.jsx` | Cart review + restaurant; continue to checkout |
-| `/checkout` | `src/app/checkout/page.jsx` | Car plate, payment, place order (guest via anonymous auth) |
+| `/checkout` | `src/app/checkout/page.jsx` | Pickup/car-service choice, conditional car details, payment, place order (guest via anonymous auth) |
 | `/track` | `src/app/track/page.jsx` | Live status via `onSnapshot` (`?id=` Firestore doc id) |
 | `/orders` | `src/app/orders/page.jsx` | Order history / reorder — **full account required** |
 | `/account` | `src/app/account/page.jsx` | Email/password + Google; profile / sign out |
@@ -113,16 +121,21 @@ Staff profiles (`users` with `admin` / `cashier` / `user`) are owned by the admi
   - `src/lib/orders.js` — `createOrder` (calls `ensureAuth()`), `subscribeToOrder`, `fetchUserOrders`
 - **i18n:** `src/lib/i18n/` — dictionaries `en.js` / `ar.js`. Default **Arabic RTL**. Use logical CSS (`start`/`end`/`ms`/`me`/`border-e`), not raw `left`/`right`. Add **both** EN and AR strings for any new UI copy.
 - **Public information pages:** `PublicInfoPage` renders localized policy/support sections and the shared support email action for `/privacy`, `/terms`, `/delete-account`, and `/support`.
-- **Money / orders:** `formatSAR`, `generateOrderNumber`, `statusColors` in `src/lib/utils.js`.
+- **Money / orders:** `formatSAR`, `statusColors` in `src/lib/utils.js`.
 - **Types:** update JSDoc in `src/types/index.js` when changing data shapes.
 - **Cart merge:** same item with different `selectedSize` / `selectedCookingOption` / `selectedExtras` stays as separate lines (`src/hooks/useCart.jsx`).
 - **Menu helpers:** `src/lib/menuDefaults.js` — cheapest size, default cooking, size price add, option summaries.
 
 ### Order contract (`createOrder`)
 
+Pickup is shared across all four clients, including the [POS](../masoub-alqarya-pos/AGENTS.md). `fulfillmentType` is `driveThrough` or `pickup`; missing means legacy car service. Checkout offers both methods. Pickup does not require car details and the order writer clears all three vehicle fields even if the browser remembers a car; it does not overwrite saved car preferences. [src/lib/fulfillment.js](./src/lib/fulfillment.js) normalizes the payload and maps order-aware status labels. Keep it aligned with the mobile helper. Pickup uses the chosen branch and order number for collection.
+
+The stored pipeline stays unchanged: `onTheWay` displays **Ready for pickup**, and `delivered` displays **Collected** for pickup orders. Track, history, and pending banners use these labels; pickup instructions replace stay-in-car copy. Admin/POS actions and POS printed tickets use the same contract. This additive field uses the same Firebase project and needs no new collection or rules deployment.
+
 Must stay aligned with mobile `src/firebase/orders.js`:
 
 - `orderNumber`, `plateNumber`, `carColor`, `carModel`
+- `fulfillmentType` (`driveThrough` | `pickup`); vehicle strings are empty for pickup
 - `paymentMethod` (`card` | `cash`), `cashAmount`, `changeAmount`, `needsChange`
 - `restaurantId`, `restaurantName` (locale-aware: AR prefers `nameAr`, EN prefers `nameEn`, with fallback)
 - `estimatedTime`, `status: "pending"`, `userId`
@@ -144,7 +157,7 @@ Must stay aligned with mobile `src/firebase/orders.js`:
 | `categories`, `menuItems`, `sizeOptions`, `extrasOptions`, `allergiesOptions` | Read (menu) |
 | `offers` | Read active (`isActive == true`) |
 | `restaurants` | Read (selection / locations) |
-| `orders` | Create (authenticated, including anonymous); read own (`userId == auth.uid`) for track & history |
+| `orders` | Create through authenticated `submitCustomerOrder` (including anonymous); read own (`userId == auth.uid`) for tracking/history |
 | `customers` | Write on full-account sign-up / Google (`customers/{uid}`) |
 
 Security rules and Storage paths live in the **admin panel** repo (`firestore.rules`, `storage.rules`). Staff helpers there use `userExists()` so customers without a `users/{uid}` doc do not fail rule evaluation.
@@ -179,3 +192,21 @@ AGENTS.md                # This file — update after each agent change
 .github/copilot-instructions.md
 README.md                # Human-facing docs — keep aligned with AGENTS.md
 ```
+
+## Customer notes and daily receipt numbers
+
+Checkout accepts optional notes (500 characters), preserves them on failure, and includes trimmed `orders.notes`. Tracking/history show them; admin/POS views and receipts/kitchen tickets retain them. Pickup Arabic and matching English copy cover collection inside the branch as well as car service.
+
+[src/lib/orders.js](./src/lib/orders.js) calls authenticated `submitCustomerOrder` in the existing Firebase project (`europe-west1`, POS Functions codebase) instead of adding an order directly. It returns `{id, orderNumber, orderDate, notes}`. The callable atomically creates the order and increments `orderCounters/{restaurantId}__{YYYY-MM-DD}`: start at 1 per branch each Saudi calendar day (Asia/Riyadh, midnight UTC+3). Mobile and web share the sequence. Existing orders and reprints keep their numbers. Never generate a number on the client.
+
+[src/lib/order-submission.js](./src/lib/order-submission.js) persists the original pending request in localStorage under `pending-order-v1:{uid}`, replays it after an uncertain response, and coalesces concurrent submissions. Confirmation or a definitive server rejection clears it; optional preference writes after confirmation must not fail checkout. Deploy the callable before releasing updated clients, then coordinate the server-only order-create rules cutover so old clients are not unexpectedly blocked.
+
+## Stock, featured items, payment release, and printer routing
+
+The shared catalog uses `menuItems.inStock` (missing means true), `isFeatured` (missing means false), and `featuredRank` (lowest first among featured items). Admin Menu provides a stock toggle plus featured/rank controls in item editing. Stock is global across branches. POS Settings lets admins update stock through `posAction/setItemStock`; branch cashiers can view it but cannot change global catalog availability. Mobile and web receive live stock updates, label unavailable products, block adding/checkout, and check offer constituents. The customer callable re-reads stock in its order/counter transaction; unavailable or removed items are rejected before allocating a receipt number. Existing accepted orders are still fulfilled. Both customer menus sort featured items first, including category-filtered views.
+
+The mobile product screen starts with no size selected and blocks adding until the customer chooses a valid attached size. Offer details require a choice for every sized constituent; `addOfferItems` takes a fourth `selectedSizes` map keyed by offer-line index. Each added offer group is distinct so different size choices never merge. Reorder may reuse a previously selected size; legacy lines lacking a size open product selection instead of choosing a default. Cooking defaults remain unchanged. Website size behavior is unchanged.
+
+POS automatic processing requires a server-issued verified `posPayments/{orderId}` proof matching branch, SAR amount, content binding and fingerprint. Card selection alone is not payment verification. Cash orders stay pending until a cashier/admin explicitly transitions them to preparing, then queued printing can run; that action does not claim cash has been collected. Paid receipt success starts preparation, and no physical print is automatically retried after dispatch uncertainty.
+
+POS `Config.routing` saves category-to-printer-ID arrays and reads legacy single strings. All enabled printers, including the first/cashier printer, can be selected per category. A category may target several printers. Receipt printers always receive one full receipt; kitchen printers receive their routed items once. Removing/disabling one destination retains the others; changing a printer template does not remove category membership. Roll out the updated POS client and callable together. No deployment or hardware verification is implied by source changes.

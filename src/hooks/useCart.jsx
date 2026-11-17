@@ -14,6 +14,7 @@ import {
   sizePriceAddFor,
 } from "@/lib/menuDefaults";
 import { CART_STORAGE_KEY, SAVED_RESTAURANT_KEY } from "@/lib/utils";
+import { isOfferInStock } from "@/lib/catalog";
 
 const CartContext = createContext(null);
 
@@ -93,6 +94,7 @@ export function CartProvider({ children }) {
   }, []);
 
   const addOfferItems = useCallback((offer, menuItems, sizeOptions = []) => {
+    if (!isOfferInStock(offer, menuItems)) return;
     setItems((current) => {
       const existing = current.filter((i) => i.offerGroupId === offer.id);
       if (existing.length > 0) {
@@ -145,6 +147,7 @@ export function CartProvider({ children }) {
           offerTitleAr: offer.titleAr,
           ...(sizeOption && {
             selectedSize: {
+              id: sizeOption.id,
               nameEn: sizeOption.nameEn,
               nameAr: sizeOption.nameAr,
               priceAdd: sizeAdd,

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import MenuCard from "@/components/MenuCard";
 import OfferCard from "@/components/OfferCard";
 import CartBar from "@/components/CartBar";
+import { sortFeatured } from "@/lib/catalog";
 
 export default function MenuPage() {
   const { t, locale } = useI18n();
@@ -31,7 +32,7 @@ export default function MenuPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return menuItems.filter((item) => {
+    return sortFeatured(menuItems.filter((item) => {
       if (categoryId !== "all" && item.category !== categoryId) return false;
       if (!q) return true;
       return (
@@ -39,7 +40,7 @@ export default function MenuPage() {
           .toLowerCase()
           .includes(q) || String(item.nameAr || "").toLowerCase().includes(q)
       );
-    });
+    }));
   }, [menuItems, categoryId, query]);
 
   return (
@@ -99,7 +100,7 @@ export default function MenuPage() {
               <h2 className="display text-2xl font-black">{t.offers}</h2>
               <div className="mt-4 flex gap-4 overflow-x-auto pb-2">
                 {offers.map((offer) => (
-                  <OfferCard key={offer.id} offer={offer} />
+                  <OfferCard key={offer.id} offer={offer} menuItems={menuItems} />
                 ))}
               </div>
             </section>

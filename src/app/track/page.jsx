@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle2, ChefHat, Clock, Truck, XCircle } from "lucide-react";
+import { CheckCircle2, ChefHat, Clock, Truck, XCircle, ShoppingBag } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { subscribeToOrder } from "@/lib/orders";
 import {
@@ -14,6 +14,7 @@ import {
   statusColors,
 } from "@/lib/utils";
 import { optionSummary } from "@/lib/menuDefaults";
+import { isPickup, orderStatusKey } from "@/lib/fulfillment";
 
 const PIPELINE = ["pending", "preparing", "onTheWay", "delivered"];
 
@@ -70,6 +71,7 @@ function TrackLive({ orderId }) {
 
   const statusIndex = PIPELINE.indexOf(order.status);
   const cancelled = order.status === "cancelled";
+  const pickup = isPickup(order);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
@@ -86,7 +88,7 @@ function TrackLive({ orderId }) {
             statusColors[order.status] || statusColors.pending,
           )}
         >
-          {t[order.status] || order.status}
+          {t[orderStatusKey(order)] || order.status}
         </span>
       </div>
 
@@ -100,7 +102,7 @@ function TrackLive({ orderId }) {
       ) : (
         <ol className="mt-10 space-y-0">
           {PIPELINE.map((status, index) => {
-            const Icon = PIPELINE_ICONS[status];
+            const Icon = pickup && status === "onTheWay" ? ShoppingBag : PIPELINE_ICONS[status];
             const done = statusIndex >= index;
             const active = statusIndex === index;
             return (
@@ -126,7 +128,7 @@ function TrackLive({ orderId }) {
                   ) : null}
                 </div>
                 <p className={cn("pt-3 font-semibold", active && "text-primary")}>
-                  {t[status]}
+                  {t[orderStatusKey(order, status)]}
                 </p>
               </li>
             );
@@ -136,16 +138,20 @@ function TrackLive({ orderId }) {
 
       {!cancelled ? (
         <p className="clay-panel mt-8 rounded-3xl p-5 text-sm font-semibold leading-relaxed">
-          {t.stayInCar}
+          {pickup ? (order.status === "delivered" ? t.pickupCollectedMessage : t.pickupInstructions) : t.stayInCar}
         </p>
       ) : null}
 
       <section className="mt-8 space-y-3 rounded-3xl border border-border bg-card p-5">
         <div className="flex justify-between gap-4 text-sm">
+          <span className="text-muted-foreground">{t.fulfillmentMethod}</span>
+          <span className="font-bold">{pickup ? t.pickup : t.driveThrough}</span>
+        </div>
+        {!pickup && <div className="flex justify-between gap-4 text-sm">
           <span className="text-muted-foreground">{t.plateNumber}</span>
           <span className="font-bold">{order.plateNumber}</span>
-        </div>
-        {order.carColor ? (
+        </div>}
+        {!pickup && order.carColor ? (
           <div className="flex justify-between gap-4 text-sm">
             <span className="text-muted-foreground">{t.carColor}</span>
             <span className="font-bold">{colorLabel(t, order.carColor)}</span>
@@ -160,6 +166,7 @@ function TrackLive({ orderId }) {
       </section>
 
       <section className="mt-6 rounded-3xl border border-border bg-card p-5">
+        {order.notes && <p className="mb-4 whitespace-pre-wrap break-words text-sm"><strong>{t.orderNotes}:</strong> {order.notes}</p>}
         <h2 className="display text-xl font-bold">{t.items}</h2>
         <ul className="mt-4 space-y-3">
           {(order.items || []).map((item, idx) => (

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { LAST_ORDER_KEY } from "@/lib/utils";
 import { subscribeToOrder } from "@/lib/orders";
+import { orderStatusKey } from "@/lib/fulfillment";
 
 const ACTIVE = ["pending", "preparing", "onTheWay"];
 
@@ -23,12 +24,7 @@ export default function PendingOrderBanner() {
 
   if (!order) return null;
 
-  const statusLabel =
-    order.status === "pending"
-      ? t.pending
-      : order.status === "preparing"
-        ? t.preparing
-        : t.onTheWay;
+  const statusLabel = t[orderStatusKey(order)];
 
   return (
     <Link

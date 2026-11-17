@@ -1,16 +1,17 @@
 import {
   collection,
-  addDoc,
   doc,
   onSnapshot,
-  serverTimestamp,
   query,
   where,
   orderBy,
   getDocs,
 } from "firebase/firestore";
-import { db, auth } from "./firebase";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import app, { db, auth } from "./firebase";
 import { ensureAuth } from "./auth";
+import { fulfillmentFields } from "./fulfillment";
+import { submitOrderOnce } from "./order-submission";
 
 /**
  * Create a new order document in Firestore.
@@ -18,15 +19,14 @@ import { ensureAuth } from "./auth";
  *
  * @param {Object} orderData
  * @param {Array} cartItems
- * @returns {Promise<string>} Firestore document ID
+ * @returns {Promise<{id: string, orderNumber: string, orderDate: string, notes: string}>} Confirmed server order
  */
 export async function createOrder(orderData, cartItems) {
+  const fulfillment = fulfillmentFields(orderData);
   const user = await ensureAuth();
   const orderDoc = {
-    orderNumber: orderData.orderNumber ?? null,
-    plateNumber: orderData.plateNumber ?? "",
-    carColor: orderData.carColor ?? "",
-    carModel: orderData.carModel ?? "",
+    ...fulfillment,
+    notes: (orderData.notes ?? "").trim(),
     paymentMethod: orderData.paymentMethod ?? null,
     cashAmount: orderData.cashAmount ?? 0,
     changeAmount: orderData.changeAmount ?? 0,
@@ -34,8 +34,6 @@ export async function createOrder(orderData, cartItems) {
     restaurantId: orderData.restaurantId ?? null,
     restaurantName: orderData.restaurantName ?? "",
     estimatedTime: orderData.estimatedTime ?? 15,
-    status: "pending",
-    userId: user.uid,
     items: cartItems.map((item) => ({
       itemId: item.id ?? null,
       nameEn: item.nameEn ?? item.name ?? "",
@@ -59,12 +57,16 @@ export async function createOrder(orderData, cartItems) {
       subtotal: item.price * item.quantity,
     })),
     total: cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0),
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
   };
 
-  const docRef = await addDoc(collection(db, "orders"), orderDoc);
-  return docRef.id;
+  const submit = httpsCallable(getFunctions(app, "europe-west1"), "submitCustomerOrder", { timeout: 30000 });
+  return submitOrderOnce({
+    userId: user.uid,
+    payload: orderDoc,
+    storage: localStorage,
+    createRequestId: () => doc(collection(db, "orders")).id,
+    send: async (request) => (await submit(request)).data,
+  });
 }
 
 export function subscribeToOrder(docId, callback, onError) {

@@ -21,6 +21,7 @@ import { useCart } from "@/hooks/useCart";
 import { formatSAR, cn } from "@/lib/utils";
 import { cheapestSizeId, sizePriceAddFor } from "@/lib/menuDefaults";
 import MenuImage from "@/components/MenuImage";
+import { isInStock } from "@/lib/catalog";
 
 function ItemEditor({ itemId }) {
   const { t, locale } = useI18n();
@@ -103,6 +104,7 @@ function ItemEditor({ itemId }) {
   };
 
   const handleAdd = () => {
+    if (!isInStock(item)) return;
     const extrasInfo = selectedExtraIds
       .map((extId) => extrasOptions.find((e) => e.id === extId))
       .filter(Boolean)
@@ -121,6 +123,7 @@ function ItemEditor({ itemId }) {
       image: item.image,
       ...(sizeOption && {
         selectedSize: {
+          id: sizeOption.id,
           nameEn: sizeOption.nameEn,
           nameAr: sizeOption.nameAr,
           priceAdd: sizeAdd,
@@ -162,6 +165,7 @@ function ItemEditor({ itemId }) {
           <h1 className="display text-3xl font-black text-primary-dark">{name}</h1>
           <p className="shrink-0 text-lg font-bold text-primary">{formatSAR(item.price)}</p>
         </div>
+        {!isInStock(item) && <p role="alert" className="mt-3 text-sm font-bold text-destructive">{t.outOfStock}</p>}
         {description ? (
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{description}</p>
         ) : null}
@@ -346,6 +350,7 @@ function ItemEditor({ itemId }) {
           <button
             type="button"
             onClick={handleAdd}
+            disabled={!isInStock(item)}
             className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md"
             aria-label={t.addToCart}
           >

@@ -1,5 +1,7 @@
 "use client";
 
+import { isPickup, orderStatusKey } from "@/lib/fulfillment";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,6 +12,8 @@ import { useCart } from "@/hooks/useCart";
 import { fetchUserOrders } from "@/lib/orders";
 import { cn, formatOrderDate, formatSAR, statusColors } from "@/lib/utils";
 import { optionSummary } from "@/lib/menuDefaults";
+import { useMenu } from "@/hooks/useMenu";
+import { isInStock } from "@/lib/catalog";
 
 export default function OrdersPage() {
   const { t, locale } = useI18n();
@@ -18,6 +22,8 @@ export default function OrdersPage() {
   const { isFullAccount, loading: authLoading } = useAuth();
   const { addItem } = useCart();
   const [orders, setOrders] = useState(null);
+  const [reorderError, setReorderError] = useState("");
+  const { menuItems, loading: menuLoading } = useMenu();
 
   useEffect(() => {
     if (authLoading || !isFullAccount) return undefined;
@@ -35,6 +41,10 @@ export default function OrdersPage() {
   }, [authLoading, isFullAccount]);
 
   const handleReorder = (order) => {
+    if (menuLoading || order.items?.some((line) => !isInStock(menuItems.find((item) => item.id === line.itemId)))) {
+      setReorderError(t.stockCartWarning);
+      return;
+    }
     (order.items || []).forEach((line) => {
       addItem({
         id: line.itemId,
@@ -79,6 +89,7 @@ export default function OrdersPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="display text-4xl font-black text-primary-dark">{t.myOrders}</h1>
+      {reorderError && <p role="alert" className="mt-4 text-destructive">{reorderError}</p>}
 
       {orders.length === 0 ? (
         <p className="mt-10 text-muted-foreground">{t.noOrdersYet}</p>
@@ -98,7 +109,7 @@ export default function OrdersPage() {
                     #{order.orderNumber}
                   </Link>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {t.orderPlacedOn} {formatOrderDate(order.createdAt)}
+                    {t.orderPlacedOn} {formatOrderDate(order.createdAt)} · {isPickup(order) ? t.pickup : t.driveThrough}
                   </p>
                 </div>
                 <span
@@ -107,7 +118,7 @@ export default function OrdersPage() {
                     statusColors[order.status] || statusColors.pending,
                   )}
                 >
-                  {t[order.status] || order.status}
+                  {t[orderStatusKey(order)] || order.status}
                 </span>
               </div>
               <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
@@ -118,6 +129,7 @@ export default function OrdersPage() {
                   </li>
                 ))}
               </ul>
+              {order.notes && <p className="mt-3 whitespace-pre-wrap break-words text-sm"><strong>{t.orderNotes}:</strong> {order.notes}</p>}
               <div className="mt-4 flex items-center justify-between">
                 <span className="font-black">{formatSAR(order.total)}</span>
                 <button
