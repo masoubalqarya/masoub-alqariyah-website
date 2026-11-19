@@ -20,7 +20,7 @@ import { useMenu } from "@/hooks/useMenu";
 import { useCart } from "@/hooks/useCart";
 import { formatSAR, cn } from "@/lib/utils";
 import { cheapestSizeId, sizePriceAddFor } from "@/lib/menuDefaults";
-import MenuImage from "@/components/MenuImage";
+import ImageCarousel from "@/components/ImageCarousel";
 import { isInStock } from "@/lib/catalog";
 
 function ItemEditor({ itemId }) {
@@ -149,7 +149,7 @@ function ItemEditor({ itemId }) {
   return (
     <div className="mx-auto max-w-3xl pb-32">
       <div className="relative aspect-[16/10] overflow-hidden bg-secondary sm:rounded-b-3xl">
-        <MenuImage src={item.image} alt={name} className="h-full w-full" />
+        <ImageCarousel images={item.images} image={item.image} alt={name} />
         {displayCalories != null ? (
           <div className="absolute bottom-4 end-4 flex items-center gap-1.5 rounded-full bg-primary-dark/75 px-3 py-1.5 text-primary-foreground">
             <Flame size={14} />

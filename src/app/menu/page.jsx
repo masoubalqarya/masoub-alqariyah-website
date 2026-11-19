@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 import MenuCard from "@/components/MenuCard";
 import OfferCard from "@/components/OfferCard";
 import CartBar from "@/components/CartBar";
-import { sortFeatured } from "@/lib/catalog";
+import { sortCategories, sortProducts } from "@/lib/catalog-order";
+import MenuImage from "@/components/MenuImage";
 
 export default function MenuPage() {
   const { t, locale } = useI18n();
@@ -17,22 +18,11 @@ export default function MenuPage() {
   const [categoryId, setCategoryId] = useState("all");
   const [query, setQuery] = useState("");
 
-  const sortedCategories = useMemo(
-    () =>
-      [...categories].sort((a, b) => {
-        const ao = a.order ?? a.sortOrder ?? 0;
-        const bo = b.order ?? b.sortOrder ?? 0;
-        if (ao !== bo) return ao - bo;
-        const an = isAr ? a.nameAr : a.nameEn;
-        const bn = isAr ? b.nameAr : b.nameEn;
-        return String(an).localeCompare(String(bn));
-      }),
-    [categories, isAr],
-  );
+  const sortedCategories = useMemo(() => sortCategories(categories), [categories]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return sortFeatured(menuItems.filter((item) => {
+    return sortProducts(menuItems.filter((item) => {
       if (categoryId !== "all" && item.category !== categoryId) return false;
       if (!q) return true;
       return (
@@ -40,8 +30,8 @@ export default function MenuPage() {
           .toLowerCase()
           .includes(q) || String(item.nameAr || "").toLowerCase().includes(q)
       );
-    }));
-  }, [menuItems, categoryId, query]);
+    }), categories);
+  }, [menuItems, categoryId, query, categories]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 pb-28">
@@ -86,6 +76,7 @@ export default function MenuPage() {
                 : "border-border bg-card",
             )}
           >
+            {cat.image && <MenuImage src={cat.image} alt="" className="me-2 inline-block h-9 w-9 rounded-full" />}
             {isAr ? cat.nameAr : cat.nameEn}
           </button>
         ))}

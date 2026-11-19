@@ -8,7 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { useMenu } from "@/hooks/useMenu";
 import { useCart } from "@/hooks/useCart";
 import { formatSAR } from "@/lib/utils";
-import MenuImage from "@/components/MenuImage";
+import ImageCarousel from "@/components/ImageCarousel";
 import { priceOffer, offerPreview, offerDetails } from "@/lib/offer-pricing";
 import { isOfferInStock } from "@/lib/catalog";
 
@@ -52,7 +52,7 @@ function OfferPageInner() {
   return (
     <div className="mx-auto max-w-3xl pb-10">
       <div className="relative aspect-[16/9] overflow-hidden bg-secondary sm:rounded-b-3xl">
-        <MenuImage src={offer.image} alt={title} className="h-full w-full" />
+        <ImageCarousel images={offer.images} image={offer.image} alt={title} />
         {displayPricing?.discount ? (
           <span className="absolute top-4 start-4 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
             <Tag size={14} />

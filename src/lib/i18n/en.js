@@ -1,4 +1,5 @@
 const en = {
+  galleryImage: "Show image",
   // Fixed-price offers
   percentageOfferSizes: "Choose a size for each sized product. The percentage discount applies to your choices and the included default cooking options. One size choice applies to the full quantity shown for that product.",
   offerStartingPrice: "Offer price from",

@@ -1,5 +1,7 @@
 /**
  * @typedef {Object} Category
+ * @property {number} [sortOrder] Display position, lowest first; natural Arabic name then ID breaks ties.
+ * @property {string} [image] Category image URL.
  * @property {string} id
  * @property {string} nameEn
  * @property {string} nameAr
@@ -22,6 +24,8 @@
 
 /**
  * @typedef {Object} MenuItem
+ * @property {number} [sortOrder] Position within category, independent of featured placement.
+ * @property {string[]} [images] Ordered gallery; first image is also saved as image for covers/cart.
  * @property {string} id
  * @property {string} nameEn
  * @property {string} nameAr
@@ -79,6 +83,7 @@
 
 /**
  * @typedef {Object} Offer
+ * @property {string[]} [images] Ordered gallery; first image is also saved as image.
  * @property {"fixed"|"percentage"} [pricingType] Defaults to fixed. Percentage applies only to the configured products/quantities.
  * @property {number|null} discountPercent Percentage rate, greater than 0 and less than 100, up to 2 decimals; null for fixed bundles.
  * @property {string} id
