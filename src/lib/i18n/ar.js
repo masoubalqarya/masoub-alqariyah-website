@@ -1,4 +1,16 @@
 const ar = {
+  // Fixed-price offers
+  percentageOfferSizes: "اختر الحجم لكل صنف له أحجام. يُطبق الخصم على اختياراتك وخيارات التحضير الافتراضية المشمولة. يسري الحجم المختار على كامل الكمية الموضحة للصنف.",
+  offerStartingPrice: "سعر العرض يبدأ من",
+  offerStartingRegularPrice: "السعر الأصلي يبدأ من",
+  offerChooseSizes: "اختر الحجم لكل صنف للمتابعة",
+  offerBeforeDiscount: "قبل الخصم",
+  offerFrom: "يبدأ من",
+  fixedOfferSizes: "يشمل العرض الأحجام الموضحة أدناه، ولا يمكن تغييرها.",
+  offerUnavailable: "هذا العرض غير متاح حالياً. يرجى اختيار عرض آخر من القائمة.",
+  cartChanged: "تغيرت بعض أصناف السلة أو أحجامها أو أسعارها. احذف الأصناف المتأثرة وأضفها مجدداً من القائمة.",
+  reviewCart: "مراجعة السلة",
+
   // Fulfillment
   inStock: "متوفر",
   outOfStock: "غير متوفر حالياً",

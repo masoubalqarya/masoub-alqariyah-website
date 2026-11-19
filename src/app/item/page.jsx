@@ -109,6 +109,7 @@ function ItemEditor({ itemId }) {
       .map((extId) => extrasOptions.find((e) => e.id === extId))
       .filter(Boolean)
       .map((ext) => ({
+        id: ext.id,
         nameEn: ext.nameEn,
         nameAr: ext.nameAr,
         priceAdd: ext.price,
@@ -131,6 +132,7 @@ function ItemEditor({ itemId }) {
       }),
       ...(cookingOption && {
         selectedCookingOption: {
+          id: cookingOption.id,
           nameEn: cookingOption.nameEn,
           nameAr: cookingOption.nameAr,
           priceAdd: cookingOption.priceAdd,

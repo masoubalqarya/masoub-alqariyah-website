@@ -8,11 +8,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import {
-  cheapestSizeId,
-  defaultCookingOption,
-  sizePriceAddFor,
-} from "@/lib/menuDefaults";
+import { priceOffer } from "@/lib/offer-pricing";
 import { CART_STORAGE_KEY, SAVED_RESTAURANT_KEY } from "@/lib/utils";
 import { isOfferInStock } from "@/lib/catalog";
 
@@ -93,77 +89,22 @@ export function CartProvider({ children }) {
     });
   }, []);
 
-  const addOfferItems = useCallback((offer, menuItems, sizeOptions = []) => {
-    if (!isOfferInStock(offer, menuItems)) return;
-    setItems((current) => {
-      const existing = current.filter((i) => i.offerGroupId === offer.id);
-      if (existing.length > 0) {
-        const newOfferQty = (existing[0].offerQty ?? 1) + 1;
-        return current.map((i) =>
-          i.offerGroupId === offer.id
-            ? { ...i, offerQty: newOfferQty, quantity: i.baseQty * newOfferQty }
-            : i,
-        );
-      }
-
-      const lineUnit = (menuItem) => {
-        if (!menuItem) return 0;
-        const sizeId = cheapestSizeId(menuItem, sizeOptions);
-        const cooking = defaultCookingOption(menuItem);
-        return (
-          (menuItem.price ?? 0) +
-          sizePriceAddFor(menuItem, sizeId, sizeOptions) +
-          (cooking?.priceAdd || 0)
-        );
-      };
-
-      const actualTotal = (offer.items || []).reduce((sum, offerItem) => {
-        const menuItem = menuItems.find((m) => m.id === offerItem.menuItemId);
-        return sum + lineUnit(menuItem) * offerItem.qty;
-      }, 0);
-      const ratio = actualTotal > 0 ? offer.offerPrice / actualTotal : 1;
-      const timestamp = Date.now();
-
-      const newItems = (offer.items || []).map((offerItem, i) => {
-        const menuItem = menuItems.find((m) => m.id === offerItem.menuItemId);
-        const sizeId = cheapestSizeId(menuItem, sizeOptions);
-        const sizeOption = sizeOptions.find((sz) => sz.id === sizeId);
-        const sizeAdd = sizePriceAddFor(menuItem, sizeId, sizeOptions);
-        const cooking = defaultCookingOption(menuItem);
-        const unit = lineUnit(menuItem);
-        return {
-          cartId: `${timestamp}_${i}`,
-          id: offerItem.menuItemId,
-          nameEn: offerItem.nameEn,
-          nameAr: offerItem.nameAr,
-          image: menuItem?.image ?? offer.image,
-          price: parseFloat((unit * ratio).toFixed(2)),
-          baseQty: offerItem.qty,
-          quantity: offerItem.qty,
-          offerQty: 1,
-          offerId: offer.id,
-          offerGroupId: offer.id,
-          offerTitleEn: offer.titleEn,
-          offerTitleAr: offer.titleAr,
-          ...(sizeOption && {
-            selectedSize: {
-              id: sizeOption.id,
-              nameEn: sizeOption.nameEn,
-              nameAr: sizeOption.nameAr,
-              priceAdd: sizeAdd,
-            },
-          }),
-          ...(cooking && {
-            selectedCookingOption: {
-              nameEn: cooking.nameEn,
-              nameAr: cooking.nameAr,
-              priceAdd: cooking.priceAdd,
-            },
-          }),
-        };
-      });
-      return [...current, ...newItems];
-    });
+  const addOfferItems = useCallback((offer, menuItems, sizeOptions = [], selectedSizes = {}) => {
+    const pricing = priceOffer(offer, menuItems, sizeOptions, selectedSizes);
+    if (!pricing || !isOfferInStock(offer, menuItems)) return false;
+    const offerGroupId = `${offer.id}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const newItems = pricing.lines.map((line, index) => ({
+      ...line,
+      cartId: `${offerGroupId}_${index}`,
+      quantity: line.baseQty,
+      offerQty: 1,
+      offerId: offer.id,
+      offerGroupId,
+      offerTitleEn: offer.titleEn,
+      offerTitleAr: offer.titleAr,
+    }));
+    setItems((current) => [...current, ...newItems]);
+    return offerGroupId;
   }, []);
 
   const updateOfferQty = useCallback((offerGroupId, newOfferQty) => {
@@ -171,6 +112,7 @@ export function CartProvider({ children }) {
       if (newOfferQty <= 0) {
         return current.filter((i) => i.offerGroupId !== offerGroupId);
       }
+      if (!Number.isInteger(newOfferQty) || current.some((i) => i.offerGroupId === offerGroupId && i.baseQty * newOfferQty > 999)) return current;
       return current.map((i) =>
         i.offerGroupId === offerGroupId
           ? { ...i, offerQty: newOfferQty, quantity: i.baseQty * newOfferQty }
@@ -186,7 +128,7 @@ export function CartProvider({ children }) {
   const clearCart = useCallback(() => setItems([]), []);
 
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
-  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const total = items.reduce((sum, i) => sum + Math.round(i.price * 100) * i.quantity, 0) / 100;
 
   const value = useMemo(
     () => ({

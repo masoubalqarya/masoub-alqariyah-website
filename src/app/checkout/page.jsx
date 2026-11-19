@@ -169,8 +169,8 @@ export default function CheckoutPage() {
       } catch { /* Tracking still opens with the confirmed order ID. */ }
       clearCart();
       router.push(`/track?id=${docId}`);
-    } catch {
-      setError(t.placeOrderError);
+    } catch (error) {
+      setError(error?.details?.reason === "cart-changed" ? t.cartChanged : t.placeOrderError);
     } finally {
       setSubmitting(false);
     }

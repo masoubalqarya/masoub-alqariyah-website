@@ -13,17 +13,18 @@ import { fetchUserOrders } from "@/lib/orders";
 import { cn, formatOrderDate, formatSAR, statusColors } from "@/lib/utils";
 import { optionSummary } from "@/lib/menuDefaults";
 import { useMenu } from "@/hooks/useMenu";
-import { isInStock } from "@/lib/catalog";
+import { priceItem, priceOffer, offerSizeChoices } from "@/lib/offer-pricing";
+import { isInStock, isOfferInStock } from "@/lib/catalog";
 
 export default function OrdersPage() {
   const { t, locale } = useI18n();
   const isAr = locale === "ar";
   const router = useRouter();
   const { isFullAccount, loading: authLoading } = useAuth();
-  const { addItem } = useCart();
+  const { addItem, addOfferItems, updateOfferQty } = useCart();
   const [orders, setOrders] = useState(null);
   const [reorderError, setReorderError] = useState("");
-  const { menuItems, loading: menuLoading } = useMenu();
+  const { menuItems, offers, sizeOptions, extrasOptions, loading: menuLoading } = useMenu();
 
   useEffect(() => {
     if (authLoading || !isFullAccount) return undefined;
@@ -45,17 +46,35 @@ export default function OrdersPage() {
       setReorderError(t.stockCartWarning);
       return;
     }
-    (order.items || []).forEach((line) => {
-      addItem({
-        id: line.itemId,
-        nameEn: line.nameEn,
-        nameAr: line.nameAr,
-        price: line.price,
-        quantity: line.quantity || 1,
-        selectedSize: line.selectedSize,
-        selectedCookingOption: line.selectedCookingOption,
-        selectedExtras: line.selectedExtras,
-      });
+    setReorderError("");
+    const groups = new Map();
+    const regular = [];
+    for (const line of order.items || []) {
+      if (line.offerGroupId) {
+        const group = groups.get(line.offerGroupId) || [];
+        group.push(line);
+        groups.set(line.offerGroupId, group);
+      } else {
+        const item = menuItems.find((entry) => entry.id === line.itemId);
+        const priced = priceItem(item, line, sizeOptions, extrasOptions);
+        if (!priced) { setReorderError(t.cartChanged); return; }
+        regular.push({ ...item, ...priced, quantity: line.quantity });
+      }
+    }
+    const bundles = [];
+    for (const group of groups.values()) {
+      const line = group[0];
+      const choices = offerSizeChoices(group);
+      const offer = offers.find((entry) => entry.id === line.offerId);
+      if (!offer || !isOfferInStock(offer, menuItems) || !choices || !priceOffer(offer, menuItems, sizeOptions, choices)) {
+        setReorderError(t.offerUnavailable); return;
+      }
+      bundles.push({ offer, quantity: line.offerQty, choices });
+    }
+    regular.forEach((item) => addItem(item));
+    bundles.forEach(({ offer, quantity, choices }) => {
+      const groupId = addOfferItems(offer, menuItems, sizeOptions, choices);
+      if (quantity > 1) updateOfferQty(groupId, quantity);
     });
     router.push("/cart");
   };

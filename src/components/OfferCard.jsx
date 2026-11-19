@@ -32,7 +32,7 @@ export default function OfferCard({ offer, menuItems }) {
         {!isOfferInStock(offer, menuItems || []) && <p className="text-sm font-bold text-destructive">{t.outOfStock}</p>}
         <h3 className="display text-lg font-bold">{title}</h3>
         <p className="mt-1 text-sm font-semibold text-primary">
-          {formatSAR(offer.offerPrice)}
+          {offer.pricingType === "percentage" && `${t.offerFrom} `}{formatSAR(offer.offerPrice)}
           <span className="ms-2 text-xs font-normal text-muted-foreground line-through">
             {formatSAR(offer.originalPrice)}
           </span>

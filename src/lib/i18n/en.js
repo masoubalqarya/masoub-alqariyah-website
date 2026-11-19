@@ -1,4 +1,16 @@
 const en = {
+  // Fixed-price offers
+  percentageOfferSizes: "Choose a size for each sized product. The percentage discount applies to your choices and the included default cooking options. One size choice applies to the full quantity shown for that product.",
+  offerStartingPrice: "Offer price from",
+  offerStartingRegularPrice: "Regular price from",
+  offerChooseSizes: "Choose a size for each product to continue",
+  offerBeforeDiscount: "before discount",
+  offerFrom: "From",
+  fixedOfferSizes: "This offer includes the sizes shown below. Sizes are fixed.",
+  offerUnavailable: "This offer is unavailable. Please choose another offer from the menu.",
+  cartChanged: "Some cart items, sizes, or prices have changed. Remove the affected items and add them again from the menu.",
+  reviewCart: "Review cart",
+
   // Fulfillment
   inStock: "In stock",
   outOfStock: "Out of stock",

@@ -8,6 +8,7 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { offerPreview } from "@/lib/offer-pricing";
 import { docWithId } from "@/lib/menuDefaults";
 
 export function useMenu() {
@@ -51,7 +52,7 @@ export function useMenu() {
   return {
     categories,
     menuItems,
-    offers,
+    offers: offers.map((offer) => ({ ...offer, ...offerPreview(offer, menuItems, sizeOptions) })),
     sizeOptions,
     extrasOptions,
     allergiesOptions,

@@ -50,7 +50,8 @@ export async function createOrder(orderData, cartItems) {
       ...(item.offerGroupId && {
         offerGroupId: item.offerGroupId,
         offerId: item.offerId ?? null,
-        offerQty: item.offerQty ?? 1,
+        offerQty: item.offerQty,
+        offerLineIndex: item.offerLineIndex,
         offerTitleEn: item.offerTitleEn ?? "",
         offerTitleAr: item.offerTitleAr ?? "",
       }),
