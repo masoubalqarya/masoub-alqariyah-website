@@ -183,3 +183,9 @@ The pure offer-pricing helper is mirrored in admin/mobile/web and checked agains
 See [AGENTS.md](./AGENTS.md#admin-content-and-catalog-presentation) for fields, caching, security paths and rollout details.
 
 Admin Menu ? Arrange menu controls category and product order through handles/arrows and Save order. Product positions are independent of featured placement; the mobile homepage has a separate featured section. The shared ordering helper uses natural Arabic names for ties, so display-language changes do not reshuffle the catalog.
+
+## Cash orders and operational updates
+
+Customer checkout is cash-only; online payment is informational. Customers/branch cashiers can edit quantities, notes and car details or cancel during the first 60 seconds before preparation. Active admins can correct/cancel later with a reason and immutable before/after history. The shared callables enforce ownership, branch, timing, revisions and print fences; direct client order updates are denied by the synchronized rules. Prepared-order edits require staff review and an explicit audited reprint.
+
+Source changes do not deploy services or rules. Review the shared callable/rules/client rollout together when authorized. No builds, deployments, live changes or hardware acceptance were performed. See AGENTS.md for the contract and device limits.

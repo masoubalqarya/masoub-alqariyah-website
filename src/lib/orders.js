@@ -27,7 +27,7 @@ export async function createOrder(orderData, cartItems) {
   const orderDoc = {
     ...fulfillment,
     notes: (orderData.notes ?? "").trim(),
-    paymentMethod: orderData.paymentMethod ?? null,
+    paymentMethod: "cash",
     cashAmount: orderData.cashAmount ?? 0,
     changeAmount: orderData.changeAmount ?? 0,
     needsChange: orderData.needsChange ?? true,
@@ -40,6 +40,7 @@ export async function createOrder(orderData, cartItems) {
       nameAr: item.nameAr ?? item.name ?? "",
       price: item.price ?? 0,
       quantity: item.quantity ?? 1,
+      notes: item.notes || "",
       ...(item.selectedSize && { selectedSize: item.selectedSize }),
       ...(item.selectedCookingOption && {
         selectedCookingOption: item.selectedCookingOption,
@@ -98,4 +99,10 @@ export async function fetchUserOrders() {
   );
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function changeExistingOrder(order, operation, patch, reason = "", requestId) {
+  await ensureAuth();
+  const change = httpsCallable(getFunctions(app, "europe-west1"), "changeCustomerOrder", { timeout: 30000 });
+  return (await change({ orderId: order.id, expectedRevision: order.revision || 0, operation, patch: patch || {}, reason, requestId })).data;
 }

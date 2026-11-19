@@ -1,4 +1,16 @@
 const en = {
+  onlinePaymentSoon: "Online payment coming soon",
+  editOrder: "Edit order",
+  cancelOrder: "Cancel order",
+  confirmCancelOrder: "Confirm order cancellation",
+  orderChangeWindow: "Edit or cancel before preparation. Time remaining:",
+  orderChangeClosed: "Editing is closed: 60 seconds have passed or preparation has started.",
+  orderEditScope: "Edit quantities, notes and car details. Zero removes an item. Offers change as a complete bundle; accepted sizes, options and prices are retained.",
+  orderChangeFailed: "Could not change the order. Refresh and try again.",
+  itemNotes: "Item notes",
+  seconds: "seconds",
+  save: "Save",
+  back: "Back",
   galleryImage: "Show image",
   // Fixed-price offers
   percentageOfferSizes: "Choose a size for each sized product. The percentage discount applies to your choices and the included default cooking options. One size choice applies to the full quantity shown for that product.",

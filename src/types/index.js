@@ -133,6 +133,11 @@
 
 /**
  * @typedef {Object} Order
+ * @property {number} [revision] Server revision for optimistic order edits and status audits.
+ * @property {number} [printRevision] Content version for initial print IDs.
+ * @property {boolean} [printReviewRequired] Staff must review old paper and explicitly reprint after a prepared-order edit.
+ * @property {Object} [preparationStartedAt] Server preparation timestamp; closes customer/cashier editing.
+ * @property {Object} [posAlertAcknowledgedAt] Shared staff alert acknowledgement.
  * @property {string} id
  * @property {string} orderNumber
  * @property {string} [orderDate] Server-assigned YYYY-MM-DD in Asia/Riyadh; orderNumber starts at 1 per branch/day.

@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+import OrderChangePanel from "@/components/OrderChangePanel";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, ChefHat, Clock, Truck, XCircle, ShoppingBag } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -75,6 +76,7 @@ function TrackLive({ orderId }) {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
+      <OrderChangePanel key={`${order.id}:${order.revision || 0}`} order={order} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="display text-4xl font-black text-primary-dark">{t.trackOrder}</h1>

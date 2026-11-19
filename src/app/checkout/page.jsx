@@ -3,7 +3,7 @@
 import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Banknote, Car, Check, CreditCard } from "lucide-react";
+import { Banknote, Car, Check } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
@@ -65,7 +65,7 @@ export default function CheckoutPage() {
   const color = colorDraft ?? savedCar?.carColor ?? "";
   const hasSavedCar = Boolean(savedCar?.plateNumber);
 
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const paymentMethod = "cash";
   const [fulfillmentType, setFulfillmentType] = useState("driveThrough");
   const pickup = fulfillmentType === "pickup";
   const [needsChange, setNeedsChange] = useState(null);
@@ -269,34 +269,8 @@ export default function CheckoutPage() {
 
         <section>
           <h2 className="display text-2xl font-black">{t.paymentMethod}</h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={() => setPaymentMethod("card")}
-              className={cn(
-                "flex items-center gap-3 rounded-3xl border p-4 text-start",
-                paymentMethod === "card"
-                  ? "border-primary bg-secondary/60 ring-2 ring-primary/20"
-                  : "border-border bg-card",
-              )}
-            >
-              <CreditCard size={20} />
-              <span className="font-bold">{t.creditCard}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setPaymentMethod("cash")}
-              className={cn(
-                "flex items-center gap-3 rounded-3xl border p-4 text-start",
-                paymentMethod === "cash"
-                  ? "border-primary bg-secondary/60 ring-2 ring-primary/20"
-                  : "border-border bg-card",
-              )}
-            >
-              <Banknote size={20} />
-              <span className="font-bold">{t.cash}</span>
-            </button>
-          </div>
+          <div className="mt-4 flex items-center gap-3 rounded-3xl border border-primary bg-secondary/60 p-4"><Banknote size={20} /><span className="font-bold">{t.cash}</span><Check size={16} /></div>
+          <p className="mt-3 text-sm text-muted-foreground">{t.onlinePaymentSoon}</p>
 
           {paymentMethod === "cash" ? (
             <div className="mt-4 space-y-3">
