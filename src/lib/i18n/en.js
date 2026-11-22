@@ -1,4 +1,7 @@
 const en = {
+  cardOnDelivery: "Mada / card on collection",
+  cardOnDeliveryHint: "Pay by card on collection. The employee will bring the card terminal with your order to your car.",
+  cardOnPickupHint: "Pay by card using the terminal when collecting your order inside the branch.",
   onlinePaymentSoon: "Online payment coming soon",
   editOrder: "Edit order",
   cancelOrder: "Cancel order",

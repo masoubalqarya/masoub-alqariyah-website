@@ -104,7 +104,7 @@
  */
 
 /**
- * @typedef {'card' | 'cash'} PaymentMethod
+ * @typedef {'card' | 'cash' | 'cardOnDelivery'} PaymentMethod
  */
 
 /**

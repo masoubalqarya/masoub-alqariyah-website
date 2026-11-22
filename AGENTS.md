@@ -23,7 +23,7 @@ If a change is purely cosmetic with no behavioral or structural impact, a docs u
 
 ## What this is
 
-Next.js **App Router** **customer website** for **Masoub AlQarya** (معصوب القرية) in Saudi Arabia. Hybrid **marketing site + car-service/pickup ordering**: browse the menu, pick a restaurant, customize items, choose collection inside the branch or delivery to the car, pay cash, and track the order in real time.
+Next.js **App Router** **customer website** for **Masoub AlQarya** (معصوب القرية) in Saudi Arabia. Hybrid **marketing site + car-service/pickup ordering**: browse the menu, pick a restaurant, customize items, choose collection inside the branch or delivery to the car, pay cash or by Mada on collection, and track the order in real time.
 
 Backend is the **same Firebase project** as the admin panel and mobile app (Auth, Firestore, Storage). Currency is always **SAR (ر.س)**. Default UI locale is **Arabic RTL**; English LTR is toggleable.
 
@@ -136,7 +136,7 @@ Must stay aligned with mobile `src/firebase/orders.js`:
 
 - `orderNumber`, `plateNumber`, `carColor`, `carModel`
 - `fulfillmentType` (`driveThrough` | `pickup`); vehicle strings are empty for pickup
-- `paymentMethod` (`cash`; existing stored card records remain read-only to customers), `cashAmount`, `changeAmount`, `needsChange`
+- `paymentMethod` (`cash` | `cardOnDelivery`; `card` is reserved for online payment), `cashAmount`, `changeAmount`, `needsChange`
 - `restaurantId`, `restaurantName` (locale-aware: AR prefers `nameAr`, EN prefers `nameEn`, with fallback)
 - `estimatedTime`, `status: "pending"`, `userId`
 - Line items: `itemId`, `nameEn`/`nameAr`, `price`, `quantity`, optional `selectedSize` / `selectedCookingOption` / `selectedExtras`, optional offer group fields, `subtotal`
@@ -207,7 +207,7 @@ The shared catalog uses `menuItems.inStock` (missing means true), `isFeatured` (
 
 Regular mobile products require customer size selection. Offers support `pricingType: "fixed" | "percentage"` (default fixed). Fixed bundles use admin-configured `items[].sizeId`; percentage offers use `discountPercent` and customer-selected attached sizes on mobile/web. One size choice applies to the full configured row quantity. The regular total includes the selected sizes and default cooking options. `addOfferItems(offer, menuItems, sizeOptions, selectedSizes)` creates a distinct group; the optional fourth argument maps offer-row indices to customer size IDs for percentage offers. Integer-halala allocation preserves exact totals. Reorder restores valid percentage size choices and rebuilds current pricing; unavailable offers require menu review. No legacy offer/order migration is provided during development.
 
-POS automatic processing requires a server-issued verified `posPayments/{orderId}` proof matching branch, SAR amount, content binding and fingerprint. Card selection alone is not payment verification. Cash orders stay pending until a cashier/admin explicitly transitions them to preparing, then queued printing can run; that action does not claim cash has been collected. Paid receipt success starts preparation, and no physical print is automatically retried after dispatch uncertainty.
+POS automatic processing of online-paid orders requires a server-issued verified `posPayments/{orderId}` proof matching branch, SAR amount, content binding and fingerprint. Card selection alone is not payment verification. Cash and Mada-on-collection orders stay pending until a cashier/admin explicitly transitions them to preparing, then queued printing can run; that action does not claim cash has been collected. Paid receipt success starts preparation, and no physical print is automatically retried after dispatch uncertainty.
 
 POS `Config.routing` saves category-to-printer-ID arrays and reads legacy single strings. All enabled printers, including the first/cashier printer, can be selected per category. A category may target several printers. Receipt printers always receive one full receipt; kitchen printers receive their routed items once. Removing/disabling one destination retains the others; changing a printer template does not remove category membership. Roll out the updated POS client and callable together. No deployment or hardware verification is implied by source changes.
 
@@ -238,12 +238,20 @@ Admin Menu has an Arrange menu tab, plus shortcuts from Categories and each prod
 `sortProducts` respects only category/product positions. `sortFeaturedProducts` uses `isFeatured` and independent `featuredRank`. The app homepage shows a virtualized horizontal Featured picks section of available products, ordered by featured rank. It reuses product cards and their existing detail/quick-add behavior; the section hides when empty or a category filter is selected. Featured products remain in the normal catalog too. No dependencies, collections, rules, builds, deployments or live writes were added for this change. Focused ordering/move/parity tests: `node src/lib/catalog-order.test.mjs` from the admin repository.
 
 
-## Cash checkout and audited order changes
+## Pay-on-collection checkout and audited order changes
 
-Customer checkout is cash-only in mobile and web. Payment UI shows the informational online-payment-coming-soon message without a selectable online method. The customer submission callable rejects non-cash methods before allocating an order number. The existing cash amount/change flow remains; accepting cash preparation does not record collection.
+Mobile/web checkout accepts `cash` or `cardOnDelivery` ("(مدى) شبكة"). Mada is collected in person using the employee's terminal and skips cash/change entry; it is distinct from online `card`, which customer submission still rejects. Cash keeps its amount/change flow. Both collection methods wait for staff acceptance before preparation/printing; acceptance never records payment collection.
 
 Authenticated `changeCustomerOrder` in `europe-west1` (existing POS Functions codebase/project) handles edits/cancellations for customers and staff. The owner or active branch cashier may change an order only while `pending`, without `preparationStartedAt`, and strictly less than 60 seconds after its immutable server creation time. Active admins may correct/cancel later with a mandatory reason, except an already cancelled order. UI editing covers quantities (zero removes a line), whole offer-group quantities, per-line/order notes and car details; accepted sizes/options/unit prices are retained. Empty orders use cancellation. Branch, ownership, profile revocation, expected `revision` and the server clock are checked transactionally. A request ID makes retries idempotent; a different payload cannot reuse a request ID. Changes never allocate a new receipt number. Cash-change tender amounts must still cover the new total.
 
 Every edit/cancellation creates immutable `orders/{id}/changeHistory/{requestId}` with actor, role, reason and before/after snapshots. Cancellations also update the legacy status history and revisioned POS status audit. Active staff can read branch audit records; clients cannot write them. Shared admin/POS Firestore rules now deny direct order updates, including status changes. Admin status advancement uses `posAction/transition` so preparation and audit checks cannot be bypassed by a client write. Deploy updated callables and clients together before the reviewed rules cutover; no deployment is implied by source edits.
 
 Active printer claims and unresolved dispatch uncertainty block changes until printing/recovery is settled. Changed pending jobs are invalidated, and `printRevision` versions future initial jobs. An edit after preparation sets `printReviewRequired`, suppressing automatic replacement printing. Staff must review existing paper and explicitly use the audited reprint controls for affected printers. Canonical ticket binding, category routing, dispatch fencing and no automatic resend after ambiguity remain intact.
+
+## Mada on collection
+
+`paymentMethod: "cardOnDelivery"` identifies "(مدى) شبكة", paid in person using the employee's terminal. It is separate from online `card`. Mobile submits from payment directly to confirmation, bypassing `/cashpayment`; cash retains its change flow. Both pickup and car service work, with terminal instructions appropriate to the method. Confirmation, tracking, history, admin orders and analytics distinguish Mada from cash/online cards.
+
+The customer callable accepts only cash/Mada and clears Mada cash/change fields. Staff explicitly accept either collection method before preparation/printing; acceptance and receipt success do not verify collection. Existing online proofs remain required for `card`. Cashier/kitchen tickets remind staff to bring the terminal, and Mada participates in content binding without changing legacy bindings. Audited edits keep Mada cash fields at zero and preserve existing windows/revisions/print fences. Pending Mada demo data and focused customer-order/domain/demo tests cover the flow.
+
+Release the updated `submitCustomerOrder`, `changeCustomerOrder`, `posAction` and affected clients together. No rules, collections, dependencies, builds or deployments were changed.

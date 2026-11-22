@@ -3,7 +3,7 @@
 import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Banknote, Car, Check } from "lucide-react";
+import { Banknote, Car, Check, CreditCard } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
@@ -65,7 +65,7 @@ export default function CheckoutPage() {
   const color = colorDraft ?? savedCar?.carColor ?? "";
   const hasSavedCar = Boolean(savedCar?.plateNumber);
 
-  const paymentMethod = "cash";
+  const [paymentMethod, setPaymentMethod] = useState("cash");
   const [fulfillmentType, setFulfillmentType] = useState("driveThrough");
   const pickup = fulfillmentType === "pickup";
   const [needsChange, setNeedsChange] = useState(null);
@@ -269,7 +269,15 @@ export default function CheckoutPage() {
 
         <section>
           <h2 className="display text-2xl font-black">{t.paymentMethod}</h2>
-          <div className="mt-4 flex items-center gap-3 rounded-3xl border border-primary bg-secondary/60 p-4"><Banknote size={20} /><span className="font-bold">{t.cash}</span><Check size={16} /></div>
+          <div className="mt-4 grid gap-3" role="radiogroup" aria-label={t.paymentMethod}>
+            {[{ method: "cash", label: t.cash, Icon: Banknote }, { method: "cardOnDelivery", label: t.cardOnDelivery, Icon: CreditCard }].map(({ method, label, Icon }) => (
+              <label key={method} className={cn("flex cursor-pointer items-center gap-3 rounded-3xl border p-4", paymentMethod === method ? "border-primary bg-secondary/60" : "border-border bg-card")}>
+                <input type="radio" name="paymentMethod" value={method} checked={paymentMethod === method} disabled={submitting} onChange={() => setPaymentMethod(method)} className="accent-primary" />
+                <Icon size={20} /><span className="font-bold">{label}</span>{paymentMethod === method && <Check size={16} />}
+              </label>
+            ))}
+          </div>
+          {paymentMethod === "cardOnDelivery" && <p className="mt-3 text-sm text-muted-foreground">{pickup ? t.cardOnPickupHint : t.cardOnDeliveryHint}</p>}
           <p className="mt-3 text-sm text-muted-foreground">{t.onlinePaymentSoon}</p>
 
           {paymentMethod === "cash" ? (

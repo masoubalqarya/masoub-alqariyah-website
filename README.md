@@ -164,7 +164,7 @@ Checkout supports optional notes (up to 500 characters), visible to staff and on
 
 ## Stock, featured catalog, and POS release
 
-Manage shared stock in Admin Menu (or POS Settings as an admin). Featured items and their rank are configured in Admin Menu and shown first in customer menus. Unavailable items/offers cannot be checked out; the server validates stock again. Regular mobile products require sizes; fixed offers use admin-configured sizes, while percentage offers let customers choose sizes and calculate the discounted total. POS paid orders require verified payment records; cash orders wait for a cashier to start preparation. Category routing supports several printers, including the first receipt printer, with one full receipt and routed kitchen copies. Updated client/backend rollout is required; no builds/deployments are run automatically.
+Manage shared stock in Admin Menu (or POS Settings as an admin). Featured items and their rank are configured in Admin Menu and shown first in customer menus. Unavailable items/offers cannot be checked out; the server validates stock again. Regular mobile products require sizes; fixed offers use admin-configured sizes, while percentage offers let customers choose sizes and calculate the discounted total. POS paid orders require verified payment records; cash and Mada-on-collection orders wait for a cashier to start preparation. Category routing supports several printers, including the first receipt printer, with one full receipt and routed kitchen copies. Updated client/backend rollout is required; no builds/deployments are run automatically.
 
 ## Offer pricing models
 
@@ -184,8 +184,12 @@ See [AGENTS.md](./AGENTS.md#admin-content-and-catalog-presentation) for fields, 
 
 Admin Menu ? Arrange menu controls category and product order through handles/arrows and Save order. Product positions are independent of featured placement; the mobile homepage has a separate featured section. The shared ordering helper uses natural Arabic names for ties, so display-language changes do not reshuffle the catalog.
 
-## Cash orders and operational updates
+## Pay-on-collection orders and operational updates
 
-Customer checkout is cash-only; online payment is informational. Customers/branch cashiers can edit quantities, notes and car details or cancel during the first 60 seconds before preparation. Active admins can correct/cancel later with a reason and immutable before/after history. The shared callables enforce ownership, branch, timing, revisions and print fences; direct client order updates are denied by the synchronized rules. Prepared-order edits require staff review and an explicit audited reprint.
+Customer checkout offers `cash` and `cardOnDelivery` ("(مدى) شبكة", collected using the employee's terminal). Online `card` remains separate and unavailable for new customer submissions. Customers/branch cashiers can edit quantities, notes and car details or cancel during the first 60 seconds before preparation. Active admins can correct/cancel later with a reason and immutable before/after history. The shared callables enforce ownership, branch, timing, revisions and print fences; direct client order updates are denied by the synchronized rules. Prepared-order edits require staff review and an explicit audited reprint.
 
 Source changes do not deploy services or rules. Review the shared callable/rules/client rollout together when authorized. No builds, deployments, live changes or hardware acceptance were performed. See AGENTS.md for the contract and device limits.
+
+## Mada on collection
+
+Checkout now offers `cardOnDelivery` ("(مدى) شبكة") alongside cash. It skips cash/change entry and collects payment in person with the employee's terminal, including branch pickup. POS staff accept these orders before preparation/printing; receipts and kitchen tickets remind them to bring the terminal. Online `card` keeps its verified-payment requirement. Audited edits, retries and admin reports retain the distinction. Release updated callables and clients together; no deployment was performed. See the shared payment contract in [AGENTS.md](./AGENTS.md).

@@ -146,6 +146,11 @@ function TrackLive({ orderId }) {
 
       <section className="mt-8 space-y-3 rounded-3xl border border-border bg-card p-5">
         <div className="flex justify-between gap-4 text-sm">
+          <span className="text-muted-foreground">{t.paymentMethod}</span>
+          <span className="font-bold">{order.paymentMethod === "cardOnDelivery" ? t.cardOnDelivery : order.paymentMethod === "card" ? t.card : t.cash}</span>
+        </div>
+        {order.paymentMethod === "cardOnDelivery" && !["delivered", "cancelled"].includes(order.status) && <p className="text-sm text-muted-foreground">{pickup ? t.cardOnPickupHint : t.cardOnDeliveryHint}</p>}
+        <div className="flex justify-between gap-4 text-sm">
           <span className="text-muted-foreground">{t.fulfillmentMethod}</span>
           <span className="font-bold">{pickup ? t.pickup : t.driveThrough}</span>
         </div>

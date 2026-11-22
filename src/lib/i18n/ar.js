@@ -1,4 +1,7 @@
 const ar = {
+  cardOnDelivery: "(مدى) شبكة",
+  cardOnDeliveryHint: "الدفع بالبطاقة عند الاستلام؛ سيحضر الموظف جهاز الشبكة مع الطلب إلى سيارتك.",
+  cardOnPickupHint: "الدفع بالبطاقة عبر جهاز الشبكة عند استلام الطلب داخل الفرع.",
   onlinePaymentSoon: "الدفع الإلكتروني قريبًا",
   editOrder: "تعديل الطلب",
   cancelOrder: "إلغاء الطلب",

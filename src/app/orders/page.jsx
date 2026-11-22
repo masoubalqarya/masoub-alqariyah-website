@@ -140,6 +140,7 @@ export default function OrdersPage() {
                   {t[orderStatusKey(order)] || order.status}
                 </span>
               </div>
+              <p className="mt-3 text-sm text-muted-foreground">{t.paymentMethod}: {order.paymentMethod === "cardOnDelivery" ? t.cardOnDelivery : order.paymentMethod === "card" ? t.card : t.cash}</p>
               <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
                 {(order.items || []).slice(0, 3).map((item, idx) => (
                   <li key={idx}>
