@@ -10,11 +10,12 @@ import OfferCard from "@/components/OfferCard";
 import CartBar from "@/components/CartBar";
 import { sortCategories, sortProducts } from "@/lib/catalog-order";
 import MenuImage from "@/components/MenuImage";
+import MenuBuilders from "@/components/MenuBuilders";
 
 export default function MenuPage() {
   const { t, locale } = useI18n();
   const isAr = locale === "ar";
-  const { categories, menuItems, offers, loading } = useMenu();
+  const { categories, menuItems, offers, sizeOptions, loading } = useMenu();
   const [categoryId, setCategoryId] = useState("all");
   const [query, setQuery] = useState("");
 
@@ -36,6 +37,8 @@ export default function MenuPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 pb-28">
       <h1 className="display text-4xl font-black text-primary-dark">{t.menu}</h1>
+
+      <MenuBuilders menuItems={menuItems} sizeOptions={sizeOptions} loading={loading} />
 
       <div className="relative mt-6">
         <Search

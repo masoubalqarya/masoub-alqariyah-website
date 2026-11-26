@@ -11,6 +11,10 @@ Next.js **App Router** customer website for **Masoub AlQarya** (معصوب ال�
 
 Anonymous Auth + Google must be enabled in the Firebase console; add the website domain to authorized domains. Do not add a second rules file here.
 
+## Shared menu builders
+
+`src/components/MenuBuilders.jsx` renders Areeka/Masoub cards before `/menu` search/categories. `useMenuBuilders` independently reads existing public `appSettings/mobile.builders.{areeka,masoub}` and exposes load/retry feedback. Use the same links as mobile, real product IDs and catalog options; explicit deleted targets must never fall back. `/item?id=…&builder=areeka|masoub` adds builder copy and explicit size selection; regular links retain their default size. Use shared `priceItem` for snapshots and halala pricing and block stale choices with Reset choices. No order/schema/printing change is needed. The mirrored helper and parity check live in `src/lib/menu-builders.js` and `src/lib/menu-builders.test.mjs`. See [AGENTS.md](../AGENTS.md).
+
 ## Tech stack
 
 - Next.js 16 (`src/app`), React 19, **JavaScript / JSX** (JSDoc in `src/types/index.js`)

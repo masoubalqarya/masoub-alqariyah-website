@@ -22,8 +22,10 @@ import { formatSAR, cn } from "@/lib/utils";
 import { cheapestSizeId, sizePriceAddFor } from "@/lib/menuDefaults";
 import ImageCarousel from "@/components/ImageCarousel";
 import { isInStock } from "@/lib/catalog";
+import { priceItem } from "@/lib/offer-pricing";
+import { MENU_BUILDERS } from "@/lib/menu-builders";
 
-function ItemEditor({ itemId }) {
+function ItemEditor({ itemId, builder }) {
   const { t, locale } = useI18n();
   const isAr = locale === "ar";
   const router = useRouter();
@@ -48,14 +50,18 @@ function ItemEditor({ itemId }) {
     ? item.cookingOptions.find((o) => o.isDefault) || item.cookingOptions[0]
     : null;
   const selectedCookingId = cookingOverride ?? defaultCooking?.id ?? null;
-  const selectedSizeId = sizeOverride ?? cheapestSizeId(item, sizeOptions);
+  const builderTitle = MENU_BUILDERS.find((entry) => entry.id === builder)?.titleKey;
+  const selectedSizeId = sizeOverride ?? (builderTitle ? null : cheapestSizeId(item, sizeOptions));
 
   if (loading) {
     return <p className="px-4 py-20 text-center text-muted-foreground">{t.loading}</p>;
   }
 
   if (!item) {
-    return <p className="px-4 py-20 text-center text-muted-foreground">{t.noData}</p>;
+    return <div className="px-4 py-20 text-center">
+      <p className="text-muted-foreground">{t.builderUnavailable}</p>
+      <Link href="/menu" className="mt-4 inline-block text-sm font-semibold text-accent hover:underline">{t.backToMenu}</Link>
+    </div>;
   }
 
   const extrasList = extrasOptions.filter((extra) =>
@@ -72,7 +78,13 @@ function ItemEditor({ itemId }) {
   );
   const cookingAdd = cookingOption?.priceAdd || 0;
   const sizeAdd = sizePriceAddFor(item, selectedSizeId, sizeOptions);
-  const sizeOption = availableSizes.find((sz) => sz.id === selectedSizeId);
+  const needsSize = (item.availableSizes?.length ?? 0) > 0 && !availableSizes.some((size) => size.id === selectedSizeId);
+  const pricing = priceItem(item, {
+    ...(selectedSizeId && { selectedSize: { id: selectedSizeId } }),
+    ...(selectedCookingId && { selectedCookingOption: { id: selectedCookingId } }),
+    selectedExtras: selectedExtraIds.map((id) => ({ id })),
+  }, sizeOptions, extrasOptions);
+  const canAdd = isInStock(item) && !!pricing;
 
   const displayCalories =
     availableSizes.length > 0 &&
@@ -81,7 +93,7 @@ function ItemEditor({ itemId }) {
       ? item.sizeCalories[selectedSizeId]
       : (item.calories ?? null);
 
-  const unitPrice = (item.price || 0) + extrasTotal + cookingAdd + sizeAdd;
+  const unitPrice = pricing?.price ?? (item.price || 0) + extrasTotal + cookingAdd + sizeAdd;
   const totalPrice = unitPrice * quantity;
 
   const displayedAllergies = (() => {
@@ -104,41 +116,14 @@ function ItemEditor({ itemId }) {
   };
 
   const handleAdd = () => {
-    if (!isInStock(item)) return;
-    const extrasInfo = selectedExtraIds
-      .map((extId) => extrasOptions.find((e) => e.id === extId))
-      .filter(Boolean)
-      .map((ext) => ({
-        id: ext.id,
-        nameEn: ext.nameEn,
-        nameAr: ext.nameAr,
-        priceAdd: ext.price,
-      }));
-
+    if (!canAdd) return;
     addItem({
       id: item.id,
       nameEn: item.nameEn,
       nameAr: item.nameAr,
-      price: unitPrice,
+      ...pricing,
       quantity,
       image: item.image,
-      ...(sizeOption && {
-        selectedSize: {
-          id: sizeOption.id,
-          nameEn: sizeOption.nameEn,
-          nameAr: sizeOption.nameAr,
-          priceAdd: sizeAdd,
-        },
-      }),
-      ...(cookingOption && {
-        selectedCookingOption: {
-          id: cookingOption.id,
-          nameEn: cookingOption.nameEn,
-          nameAr: cookingOption.nameAr,
-          priceAdd: cookingOption.priceAdd,
-        },
-      }),
-      ...(extrasInfo.length > 0 && { selectedExtras: extrasInfo }),
     });
     router.push("/menu");
   };
@@ -164,9 +149,13 @@ function ItemEditor({ itemId }) {
           {t.backToMenu}
         </Link>
         <div className="mt-4 flex items-start justify-between gap-4">
-          <h1 className="display text-3xl font-black text-primary-dark">{name}</h1>
+          <h1 className="display text-3xl font-black text-primary-dark">{builderTitle ? t[builderTitle] : name}</h1>
           <p className="shrink-0 text-lg font-bold text-primary">{formatSAR(item.price)}</p>
         </div>
+        {builderTitle && <div className="mt-3 space-y-2">
+          <p className="font-semibold text-primary-dark">{name}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{t.builderHint}</p>
+        </div>}
         {!isInStock(item) && <p role="alert" className="mt-3 text-sm font-bold text-destructive">{t.outOfStock}</p>}
         {description ? (
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{description}</p>
@@ -204,6 +193,7 @@ function ItemEditor({ itemId }) {
                   <button
                     key={sz.id}
                     type="button"
+                    aria-pressed={active}
                     onClick={() => setSizeOverride(sz.id)}
                     className={cn(
                       "flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold",
@@ -243,6 +233,7 @@ function ItemEditor({ itemId }) {
                   <button
                     key={opt.id}
                     type="button"
+                    aria-pressed={active}
                     onClick={() => setCookingOverride(opt.id)}
                     className={cn(
                       "flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold",
@@ -276,6 +267,7 @@ function ItemEditor({ itemId }) {
                   <button
                     key={extra.id}
                     type="button"
+                    aria-pressed={selected}
                     onClick={() => toggleExtra(extra.id)}
                     className="flex w-full items-center gap-3 px-4 py-3 text-start"
                   >
@@ -329,6 +321,11 @@ function ItemEditor({ itemId }) {
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 px-4 py-4 backdrop-blur">
+        {isInStock(item) && !canAdd && <div role="status" className="mx-auto mb-3 flex max-w-3xl flex-wrap items-center gap-3 text-sm text-primary-dark">
+          <p>{needsSize ? t.chooseSize : t.itemOptionsChanged}</p>
+          {!needsSize && <button type="button" onClick={() => { setSelectedExtraIds([]); setCookingOverride(null); setSizeOverride(null); }}
+            className="rounded-full border border-border px-4 py-2 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{t.resetItemOptions}</button>}
+        </div>}
         <div className="mx-auto flex max-w-3xl items-center gap-4">
           <div className="flex items-center gap-2 rounded-full bg-secondary px-2 py-1">
             <button
@@ -343,7 +340,7 @@ function ItemEditor({ itemId }) {
             <button
               type="button"
               className="flex h-9 w-9 items-center justify-center rounded-full bg-card"
-              onClick={() => setQuantity((q) => q + 1)}
+              onClick={() => setQuantity((q) => Math.min(999, q + 1))}
             >
               <Plus size={16} />
             </button>
@@ -352,9 +349,9 @@ function ItemEditor({ itemId }) {
           <button
             type="button"
             onClick={handleAdd}
-            disabled={!isInStock(item)}
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md"
-            aria-label={t.addToCart}
+            disabled={!canAdd}
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label={!isInStock(item) ? t.outOfStock : needsSize ? t.chooseSize : !pricing ? t.itemOptionsChanged : t.addToCart}
           >
             <ShoppingBag size={22} />
           </button>
@@ -367,7 +364,8 @@ function ItemEditor({ itemId }) {
 function ItemPageInner() {
   const searchParams = useSearchParams();
   const itemId = searchParams.get("id");
-  return <ItemEditor key={itemId || "none"} itemId={itemId} />;
+  const builder = searchParams.get("builder");
+  return <ItemEditor key={`${itemId || "none"}:${builder || "regular"}`} itemId={itemId} builder={builder} />;
 }
 
 function PageFallback() {

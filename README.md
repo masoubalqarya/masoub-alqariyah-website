@@ -6,6 +6,10 @@ Currency is always **Saudi Riyal (SAR / ر.س)**. Default UI is **Arabic RTL**; 
 
 Agent context: `[AGENTS.md](./AGENTS.md)`. Copilot / IDE shortcuts: `[.github/copilot-instructions.md](./.github/copilot-instructions.md)`.
 
+## Build your own Areeka and Masoub
+
+The menu starts with two bilingual cards for choosing a base product's size, preparation and extras. Both website and mobile use the same base-product links from **Admin → App settings → Build-your-own cards**. Prices, images, stock and options remain managed on the real products in Menu. Builder pages require a size choice and keep the existing cart, checkout and POS receipt contracts. Missing or unavailable base products disable their cards; configuration failures provide retry feedback without blocking the regular menu. Focused checks: `node src/lib/menu-builders.test.mjs`. No production settings or deployments are changed by this source update.
+
 ## Pickup and car service
 
 Customers can choose car service or pickup inside the selected branch in the mobile app and website. Pickup skips car details and uses the order number for collection. Orders share `fulfillmentType` (`driveThrough` or `pickup`); older orders remain car service. For pickup, the existing `onTheWay` status is shown as **Ready for pickup** and `delivered` as **Collected**. The admin portal and POS show the method and matching actions, and POS receipt/kitchen tickets identify branch pickup.

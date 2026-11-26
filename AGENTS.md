@@ -2,6 +2,12 @@
 
 Living project context for AI agents. Keep this file accurate; prefer it over stale assumptions.
 
+## Shared build-your-own entry points
+
+The website and mobile menus start their catalogs with bilingual Areeka/Masoub cards using existing base catalog products and their size/cooking/extra selections. Optional `appSettings/mobile.builders.{areeka,masoub}` maps both clients' cards to menuItem IDs through Admin App settings. The website reads this existing public document through [src/hooks/useMenuBuilders.js](./src/hooks/useMenuBuilders.js), separately from the normal catalog; configuration failures show retry feedback and disable only builder cards. An unconfirmed missing offline document cannot silently override explicit links. Empty/missing mappings match standard product IDs, then a unique exact bilingual base name; explicit deleted targets stay unavailable. Inactive/out-of-stock/unpriceable products cannot be opened from builder cards. Resolution and starting-price logic in [src/lib/menu-builders.js](./src/lib/menu-builders.js) mirrors mobile and is checked by `node src/lib/menu-builders.test.mjs`.
+
+[src/components/MenuBuilders.jsx](./src/components/MenuBuilders.jsx) appears above menu search/categories. Cards open `/item?id=<menuItemId>&builder=areeka|masoub`; the query changes presentation and requires an explicit size choice for builders, while ordinary item links retain their default size. The item customizer uses `priceItem` for canonical option snapshots and halala totals, blocks stale selections with Reset choices, and resets state on product/builder changes. No synthetic products, ingredient removals, menuItem fields or order fields are introduced. Shared checkout, stock validation, reorder and POS print routing keep using real product/option IDs. No dependency, rules or backend deployment change is required.
+
 ## Mandatory maintenance
 
 **After every change you make in this repository, update `AGENTS.md` in the same turn** so it stays consistent with the codebase.
@@ -79,8 +85,8 @@ Scripts: `npm run dev` | `build` | `start` | `lint`
 | Route | File | Purpose |
 | --- | --- | --- |
 | `/` | `src/app/page.jsx` | Marketing home — hero, how it works, featured offers, locations |
-| `/menu` | `src/app/menu/page.jsx` | Categories, search, items, offers |
-| `/item` | `src/app/item/page.jsx` | Item detail + sizes/cooking/extras → cart (`?id=`) |
+| `/menu` | `src/app/menu/page.jsx` | Areeka/Masoub builders, categories, search, items, offers |
+| `/item` | `src/app/item/page.jsx` | Item detail + sizes/cooking/extras → cart (`?id=`, optional `builder=areeka|masoub`) |
 | `/offer` | `src/app/offer/page.jsx` | Offer detail → cart (`?id=`) |
 | `/cart` | `src/app/cart/page.jsx` | Cart review + restaurant; continue to checkout |
 | `/checkout` | `src/app/checkout/page.jsx` | Pickup/car-service choice, conditional car details, payment, place order (guest via anonymous auth) |
@@ -117,6 +123,7 @@ Staff profiles (`users` with `admin` / `cashier` / `user`) are owned by the admi
   - `useAuth` — Firebase user + `ensureAuth` / sign-in helpers
   - `useCart` — cart + selected restaurant in localStorage (`maq_cart_v1`, `maq_saved_restaurant`)
   - `useMenu` — categories, items, active offers, sizes, extras, allergies
+  - `useMenuBuilders` — shared admin-configured builder links, independently subscribed with retry feedback
   - `useRestaurants` — locations
   - `src/lib/orders.js` — `createOrder` (calls `ensureAuth()`), `subscribeToOrder`, `fetchUserOrders`
 - **i18n:** `src/lib/i18n/` — dictionaries `en.js` / `ar.js`. Default **Arabic RTL**. Use logical CSS (`start`/`end`/`ms`/`me`/`border-e`), not raw `left`/`right`. Add **both** EN and AR strings for any new UI copy.
@@ -156,6 +163,7 @@ Must stay aligned with mobile `src/firebase/orders.js`:
 | --- | --- |
 | `categories`, `menuItems`, `sizeOptions`, `extrasOptions`, `allergiesOptions` | Read (menu) |
 | `offers` | Read active (`isActive == true`) |
+| `appSettings/mobile` | Read `builders` links shared with mobile; website does not enforce native update policies or consume the mobile hero |
 | `restaurants` | Read (selection / locations) |
 | `orders` | Create through authenticated `submitCustomerOrder` (including anonymous); read own (`userId == auth.uid`) for tracking/history |
 | `customers` | Write on full-account sign-up / Google (`customers/{uid}`) |
